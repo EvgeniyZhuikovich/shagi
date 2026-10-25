@@ -38,29 +38,45 @@
   --success: #00ffa3; --danger: #ff3860; --warn: #ffb800;
   --grad: linear-gradient(135deg, #00e5ff 0%, #b500ff 100%);
 }
-html, body { height: 100%; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-0); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; position: relative; overflow-x: hidden; }
-body::before, body::after { content: ''; position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.35; z-index: 0; pointer-events: none; animation: float 14s ease-in-out infinite; }
-body::before { width: 400px; height: 400px; background: var(--accent-2); top: -100px; left: -100px; }
-body::after { width: 500px; height: 500px; background: var(--accent-1); bottom: -150px; right: -150px; animation-delay: -7s; }
-@keyframes float { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px, 40px) scale(1.1); } }
 
-.screen { display: none; width: 100%; max-width: 500px; position: relative; z-index: 1; }
+/* ИСПРАВЛЕНИЕ: Убираем жесткое центрирование и разрешаем скролл */
+html, body { min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+  background: var(--bg-0); 
+  color: var(--text); 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
+  position: relative;
+}
+
+body::before, body::after { content: ''; position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.35; z-index: 0; pointer-events: none; animation: float 14s ease-in-out infinite; }
+body::before { width: 300px; height: 300px; background: var(--accent-2); top: -100px; left: -100px; }
+body::after { width: 400px; height: 400px; background: var(--accent-1); bottom: -150px; right: -150px; animation-delay: -7s; }
+@keyframes float { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(20px, 20px) scale(1.1); } }
+
+.screen { display: none; width: 100%; max-width: 500px; padding: 16px; position: relative; z-index: 1; }
 .screen.active { display: block; animation: fadeIn .25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
+/* Экран входа */
+#authScreen { display: none; padding-top: 40px; }
+#authScreen.active { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; }
+
 .card, .content-card, .header, .sidebar { background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; }
-.card { padding: 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02) inset; }
-h1 { font-size: 28px; font-weight: 800; margin-bottom: 6px; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+.card { width: 100%; padding: 24px 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
 h3::before { content: ''; width: 4px; height: 16px; background: var(--grad); border-radius: 2px; }
-.subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 22px; }
+.subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; }
 
-input[type="text"], input[type="password"], input[type="number"] { width: 100%; padding: 15px 16px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; color: var(--text); margin-bottom: 12px; outline: none; transition: all .2s; font-family: inherit; }
+input[type="text"], input[type="password"], input[type="number"] { width: 100%; padding: 14px 16px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; color: var(--text); margin-bottom: 12px; outline: none; transition: all .2s; font-family: inherit; }
 input::placeholder { color: var(--text-dim); }
 input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
 
-button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s, filter .2s; margin-bottom: 10px; font-family: inherit; letter-spacing: 0.2px; }
+button { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s, filter .2s; margin-bottom: 10px; font-family: inherit; }
 button:active { transform: scale(0.97); }
 .btn-primary { background: var(--grad); color: #000; box-shadow: 0 8px 24px rgba(0,229,255,0.25); }
 .btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border-strong); }
@@ -68,17 +84,30 @@ button:active { transform: scale(0.97); }
 .btn-danger { background: linear-gradient(135deg, #ff3860, #b5003a); color: #fff; }
 .btn-warn { background: linear-gradient(135deg, #ffb800, #d98e00); color: #1a1200; }
 
-.toggle-text { text-align: center; color: var(--text-dim); font-size: 14px; margin-top: 8px; }
+.toggle-text { text-align: center; color: var(--text-dim); font-size: 14px; margin-top: 10px; }
 .toggle-text a { color: var(--accent-1); cursor: pointer; font-weight: 600; text-decoration: none; }
 .error { color: var(--danger); font-size: 13px; margin-bottom: 10px; min-height: 18px; font-weight: 500; }
 
-.header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+/* ИСПРАВЛЕНИЕ: Шапка теперь sticky и всегда прилипает к верху */
+.header { 
+  position: sticky; 
+  top: 0; 
+  z-index: 99;
+  padding: 12px 16px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  margin-bottom: 14px; 
+  background: var(--bg-1); /* Фон нужен, чтобы контент не просвечивал при прокрутке */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border-radius: 20px;
+}
 .burger { width: 32px; height: 32px; display: flex; flex-direction: column; justify-content: center; gap: 5px; cursor: pointer; padding: 4px; }
 .burger span { display: block; height: 2.5px; background: var(--text); border-radius: 2px; }
-.user-name { font-weight: 700; color: var(--text); font-size: 14px; letter-spacing: 0.3px; }
+.user-name { font-weight: 700; color: var(--text); font-size: 14px; }
 
-.content-card { padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-.step-count { font-size: 46px; font-weight: 900; text-align: center; margin: 8px 0; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1.5px; line-height: 1; filter: drop-shadow(0 0 20px rgba(0,229,255,0.3)); }
+.content-card { padding: 18px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.step-count { font-size: 42px; font-weight: 900; text-align: center; margin: 8px 0; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; filter: drop-shadow(0 0 20px rgba(0,229,255,0.3)); }
 .step-label { text-align: center; color: var(--text-dim); font-size: 12px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; }
 
 .file-input-wrapper { position: relative; overflow: hidden; width: 100%; }
@@ -95,39 +124,27 @@ button:active { transform: scale(0.97); }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; z-index: 100; }
 .overlay.active { display: block; }
-.sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1); padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); border-radius: 0 24px 24px 0; }
+.sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1); padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); }
 .sidebar.active { transform: translateX(0); }
-.sidebar h2 { color: var(--text); margin-bottom: 24px; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.sidebar h2 { color: var(--text); margin-bottom: 24px; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .menu-item { padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; font-weight: 600; color: var(--text); font-size: 15px; }
-.menu-item:hover { background: var(--surface-2); border-color: var(--accent-1); transform: translateX(3px); }
-.menu-item.danger { background: rgba(255,56,96,0.1); border-color: rgba(255,56,96,0.3); color: var(--danger); }
+.menu-item:hover { background: var(--surface-2); border-color: var(--accent-1); }
 .close-x { position: absolute; top: 20px; right: 20px; font-size: 20px; cursor: pointer; color: var(--text-dim); background: var(--surface); border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 50%; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; }
 
 .report-item { padding: 14px; border-radius: 14px; margin-bottom: 10px; background: var(--bg-1); border: 1px solid var(--border); border-left: 3px solid var(--border-strong); }
 .report-item.approved { border-left-color: var(--success); }
 .report-item.rejected { border-left-color: var(--danger); }
 .report-item.pending { border-left-color: var(--warn); }
-.report-status { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
-.report-item.approved .report-status { color: var(--success); }
-.report-item.rejected .report-status { color: var(--danger); }
-.report-item.pending .report-status { color: var(--warn); }
-.report-steps { font-size: 16px; font-weight: 700; color: var(--text); }
-.report-date { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
-
+.report-status { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
 .rating-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid var(--border); }
 .rating-row:last-child { border-bottom: none; }
-.rating-pos { width: 38px; font-weight: 800; color: var(--text-dim); font-size: 15px; }
-.rating-row.top1 .rating-pos { color: #ffd700; }
-.rating-row.top2 .rating-pos { color: #c0c0c0; }
-.rating-row.top3 .rating-pos { color: #cd7f32; }
-.rating-name { flex: 1; font-weight: 600; color: var(--text); font-size: 15px; }
-.rating-steps { font-weight: 800; font-size: 15px; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.rating-pos { width: 38px; font-weight: 800; color: var(--text-dim); }
+.rating-name { flex: 1; font-weight: 600; color: var(--text); }
+.rating-steps { font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-.empty-state { text-align: center; color: var(--text-dim); padding: 40px 20px; font-size: 14px; line-height: 1.6; }
-
-.admin-contest { padding: 14px; border-radius: 12px; background: var(--bg-1); margin-bottom: 10px; border: 1px solid var(--border); border-left: 3px solid var(--accent-2); display: flex; justify-content: space-between; align-items: center; }
+.empty-state { text-align: center; color: var(--text-dim); padding: 40px 20px; }
+.admin-contest { padding: 14px; border-radius: 12px; background: var(--bg-1); margin-bottom: 10px; border: 1px solid var(--border); border-left: 3px solid var(--accent-2); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .admin-report { padding: 14px; border-radius: 14px; background: var(--bg-1); margin-bottom: 12px; border: 1px solid var(--border); }
-.admin-report .report-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--text); }
 .admin-report img { max-width: 100%; border-radius: 10px; margin: 10px 0; border: 1px solid var(--border); }
 .action-row { display: flex; gap: 8px; }
 .action-row button { flex: 1; padding: 11px; font-size: 13px; margin: 0; }
@@ -147,6 +164,15 @@ button:active { transform: scale(0.97); }
 .info-block h4 { color: var(--accent-1); font-size: 14px; margin-bottom: 8px; font-weight: 700; }
 .info-block p, .info-block ul { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
 .info-block ul { padding-left: 20px; }
+
+/* Мобильная адаптация */
+@media (max-width: 480px) {
+  .card { padding: 20px 16px; }
+  h1 { font-size: 24px; }
+  .step-count { font-size: 36px; }
+  .header { padding: 10px 14px; }
+  .content-card { padding: 16px; }
+}
 </style>
 </head>
 <body>
@@ -248,7 +274,6 @@ button:active { transform: scale(0.97); }
 
     API.onValue(API.ref(API.db, 'contests'), (snap) => {
       const data = snap.val() || {};
-      // Сохраняем ID конкурса для удаления
       contests = Object.keys(data).map(k => ({ id: k, ...data[k] }));
       if (session && !session.isAdmin) updateMainIfActive();
       if (session && session.isAdmin && document.getElementById('adminScreen').classList.contains('active')) renderAdmin();
@@ -445,7 +470,6 @@ button:active { transform: scale(0.97); }
   }
 
   function renderAdmin() {
-    // 1. Вывод конкурсов с кнопкой удаления
     const cl = document.getElementById('adminContestsList');
     cl.innerHTML = contests.length
       ? contests.map(c => `
@@ -458,7 +482,6 @@ button:active { transform: scale(0.97); }
         </div>`).join('')
       : '<div class="empty-state">Конкурсов нет</div>';
 
-    // 2. Отчеты на проверку
     const rl = document.getElementById('adminReportsList');
     const pending = reports.filter(r => r.status === 'pending');
     if (!pending.length) {
@@ -476,7 +499,6 @@ button:active { transform: scale(0.97); }
         </div>`).join('');
     }
 
-    // 3. Пользователи (с возможностью менять шаги)
     const ul = document.getElementById('adminUsersList');
     if (!users.length) {
       ul.innerHTML = '<div class="empty-state">Пользователей нет</div>';
@@ -562,7 +584,7 @@ button:active { transform: scale(0.97); }
   }
 
   function fullReset() {
-    if (!confirm('⚠️ ПОЛНЫЙ СБРОС всех данных (включая аккаунты)?')) return;
+    if (!confirm('⚠️ ПОЛНЫЙ СБРОС всех данных?')) return;
     if (!confirm('Точно? Это необратимо.')) return;
     
     API.remove(API.ref(API.db, 'users'));
