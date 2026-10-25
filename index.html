@@ -84,7 +84,6 @@ button:active { transform: scale(0.97); }
 .step-count { font-size: 42px; font-weight: 900; text-align: center; margin: 8px 0; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; filter: drop-shadow(0 0 20px rgba(0,229,255,0.3)); }
 .step-label { text-align: center; color: var(--text-dim); font-size: 12px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; }
 
-/* Прогресс-бар */
 .progress-container { margin: 16px 0; }
 .progress-bar-bg { width: 100%; height: 12px; background: var(--bg-1); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
 .progress-bar-fill { height: 100%; background: var(--grad); width: 0%; transition: width 0.5s ease; border-radius: 6px; }
@@ -102,6 +101,7 @@ button:active { transform: scale(0.97); }
 .contest-item .meta { font-size: 13px; color: var(--text-dim); }
 .contest-item .prize { font-size: 13px; color: var(--accent-1); font-weight: 700; margin-top: 6px; }
 .contest-item .winner { font-size: 13px; color: var(--success); font-weight: 700; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.soon-badge { display: inline-block; background: rgba(255,184,0,0.12); color: var(--warn); border: 1px solid rgba(255,184,0,0.3); font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 700; margin-top: 8px; }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; z-index: 100; }
 .overlay.active { display: block; }
@@ -163,9 +163,11 @@ button:active { transform: scale(0.97); }
     <h1 id="authTitle">Регистрация</h1>
     <p class="subtitle" id="authSubtitle">Создайте аккаунт для участия</p>
     <div class="error" id="authError"></div>
+    
     <input type="text" id="regName" placeholder="Ваше имя" autocomplete="off">
     <input type="text" id="regBracelet" placeholder="Название браслета / часов" autocomplete="off">
     <input type="password" id="regPassword" placeholder="Пароль" autocomplete="off">
+    
     <button class="btn-primary" id="authBtn" onclick="handleAuth()">Зарегистрироваться</button>
     <div class="toggle-text"><span id="togglePrompt">Уже есть аккаунт?</span> <a onclick="toggleAuth()" id="toggleLink">Войти</a></div>
   </div>
@@ -237,7 +239,7 @@ button:active { transform: scale(0.97); }
   let currentScreenshot = null;
   let currentSteps = 0;
 
-  const TARGET_STEPS = 1000000; // Цель 1 миллион
+  const TARGET_STEPS = 1000000;
 
   const checkFirebase = setInterval(() => {
     if (window.firebaseReady) {
@@ -290,11 +292,36 @@ button:active { transform: scale(0.97); }
 
   function toggleAuth() {
     isRegisterMode = !isRegisterMode;
-    document.getElementById('authTitle').textContent = isRegisterMode ? 'Регистрация' : 'Вход';
-    document.getElementById('authBtn').textContent = isRegisterMode ? 'Зарегистрироваться' : 'Войти';
-    document.getElementById('togglePrompt').textContent = isRegisterMode ? 'Уже есть аккаунт?' : 'Нет аккаунта?';
-    document.getElementById('toggleLink').textContent = isRegisterMode ? 'Войти' : 'Зарегистрироваться';
-    document.getElementById('regPassword').style.display = isRegisterMode ? 'block' : 'none';
+    const title = document.getElementById('authTitle');
+    const subtitle = document.getElementById('authSubtitle');
+    const nameInput = document.getElementById('regName');
+    const braceletInput = document.getElementById('regBracelet');
+    const btn = document.getElementById('authBtn');
+    const prompt = document.getElementById('togglePrompt');
+    const link = document.getElementById('toggleLink');
+
+    if (isRegisterMode) {
+      title.textContent = 'Регистрация';
+      subtitle.textContent = 'Создайте аккаунт для участия';
+      nameInput.style.display = 'block';
+      nameInput.placeholder = 'Ваше имя';
+      nameInput.value = '';
+      braceletInput.placeholder = 'Название браслета / часов';
+      braceletInput.value = '';
+      btn.textContent = 'Зарегистрироваться';
+      prompt.textContent = 'Уже есть аккаунт?';
+      link.textContent = 'Войти';
+    } else {
+      title.textContent = 'Вход';
+      subtitle.textContent = 'Войдите в свой аккаунт';
+      nameInput.style.display = 'none';
+      nameInput.value = '';
+      braceletInput.placeholder = 'Логин (Ваше имя)';
+      braceletInput.value = '';
+      btn.textContent = 'Войти';
+      prompt.textContent = 'Нет аккаунта?';
+      link.textContent = 'Зарегистрироваться';
+    }
     document.getElementById('authError').textContent = '';
   }
 
@@ -306,38 +333,48 @@ button:active { transform: scale(0.97); }
 
   function handleAuth() {
     const name = document.getElementById('regName').value.trim();
-    const bracelet = document.getElementById('regBracelet').value.trim();
+    const loginOrBracelet = document.getElementById('regBracelet').value.trim();
     const password = document.getElementById('regPassword').value;
     const errEl = document.getElementById('authError');
     errEl.textContent = '';
 
-    if (!name || !bracelet) { errEl.textContent = 'Заполните все поля'; return; }
-
-    let userSession = null;
-
-    if (bracelet.toLowerCase() === 'adminqwerty') {
-      userSession = { bracelet: 'admin', isAdmin: true, name: 'Администратор' };
-    } else if (isRegisterMode) {
-      if (users.find(u => u.bracelet.toLowerCase() === bracelet.toLowerCase())) {
-        errEl.textContent = 'Этот браслет уже занят'; return;
+    if (!isRegisterMode) {
+      if (password === 'adminqwerty') {
+        session = { bracelet: 'admin', isAdmin: true, name: 'Администратор' };
+        const newSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+        API.set(API.ref(API.db, 'sessions/' + newSessionToken), session).then(() => {
+          window.history.replaceState(null, '', '?session=' + newSessionToken);
+          enterApp();
+        });
+        return;
       }
-      if (password.length < 3) { errEl.textContent = 'Пароль минимум 3 символа'; return; }
+
+      if (!loginOrBracelet || !password) { errEl.textContent = 'Введите логин и пароль'; return; }
+      const u = users.find(x => x.name.toLowerCase() === loginOrBracelet.toLowerCase() && x.password === password);
+      if (!u) { errEl.textContent = 'Неверный логин или пароль'; return; }
       
-      API.set(API.ref(API.db, 'users/' + bracelet), { name, password, steps: 0 });
-      userSession = { bracelet, isAdmin: false, name };
-    } else {
-      const u = users.find(x => x.bracelet.toLowerCase() === bracelet.toLowerCase() && x.password === password);
-      if (!u) { errEl.textContent = 'Неверный браслет или пароль'; return; }
-      userSession = { bracelet: u.bracelet, isAdmin: false, name: u.name };
+      session = { bracelet: u.bracelet, isAdmin: false, name: u.name };
+      const newSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+      API.set(API.ref(API.db, 'sessions/' + newSessionToken), session).then(() => {
+        window.history.replaceState(null, '', '?session=' + newSessionToken);
+        enterApp();
+      });
+      return;
     }
 
+    if (!name || !loginOrBracelet) { errEl.textContent = 'Заполните все поля'; return; }
+    if (users.find(u => u.bracelet.toLowerCase() === loginOrBracelet.toLowerCase())) {
+      errEl.textContent = 'Этот браслет уже занят'; return;
+    }
+    if (password.length < 3) { errEl.textContent = 'Пароль минимум 3 символа'; return; }
+    
+    API.set(API.ref(API.db, 'users/' + loginOrBracelet), { name: name, password: password, steps: 0 });
+    session = { bracelet: loginOrBracelet, isAdmin: false, name: name };
+    
     const newSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-    API.set(API.ref(API.db, 'sessions/' + newSessionToken), userSession).then(() => {
-      session = userSession;
+    API.set(API.ref(API.db, 'sessions/' + newSessionToken), session).then(() => {
       window.history.replaceState(null, '', '?session=' + newSessionToken);
       enterApp();
-    }).catch(err => {
-      errEl.textContent = 'Ошибка входа: ' + err.message;
     });
   }
 
@@ -353,6 +390,7 @@ button:active { transform: scale(0.97); }
     if (token) API.remove(API.ref(API.db, 'sessions/' + token));
     
     session = null;
+    localStorage.removeItem('step_session');
     window.history.replaceState(null, '', window.location.pathname);
     closeMenu();
     showScreen('authScreen');
@@ -373,8 +411,6 @@ button:active { transform: scale(0.97); }
   function renderMain() {
     const user = users.find(u => u.bracelet === session.bracelet);
     const totalSteps = user ? (user.steps || 0) : 0;
-    
-    // Расчет процентов (максимум 100%)
     const percent = Math.min((totalSteps / TARGET_STEPS) * 100, 100);
     const percentFormatted = percent.toFixed(1);
 
