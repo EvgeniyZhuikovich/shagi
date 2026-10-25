@@ -28,65 +28,125 @@
 </script>
 
 <style>
-/* ... (стили оставлены прежними для экономии места, они не менялись) ... */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-:root { --bg-0: #0a0a0f; --bg-1: #12121c; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08); --text: #f0f0f5; --text-dim: #8a8aa0; --accent-1: #00e5ff; --accent-2: #b500ff; --success: #00ffa3; --danger: #ff3860; --warn: #ffb800; --grad: linear-gradient(135deg, #00e5ff 0%, #b500ff 100%); }
+:root {
+  --bg-0: #0a0a0f; --bg-1: #12121c; --bg-2: #1a1a28;
+  --surface: rgba(255,255,255,0.04); --surface-2: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.14);
+  --text: #f0f0f5; --text-dim: #8a8aa0;
+  --accent-1: #00e5ff; --accent-2: #b500ff;
+  --success: #00ffa3; --danger: #ff3860; --warn: #ffb800;
+  --grad: linear-gradient(135deg, #00e5ff 0%, #b500ff 100%);
+}
 html, body { height: 100%; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-0); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; position: relative; overflow-x: hidden; }
+body::before, body::after { content: ''; position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.35; z-index: 0; pointer-events: none; animation: float 14s ease-in-out infinite; }
+body::before { width: 400px; height: 400px; background: var(--accent-2); top: -100px; left: -100px; }
+body::after { width: 500px; height: 500px; background: var(--accent-1); bottom: -150px; right: -150px; animation-delay: -7s; }
+@keyframes float { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px, 40px) scale(1.1); } }
+
 .screen { display: none; width: 100%; max-width: 500px; position: relative; z-index: 1; }
-.screen.active { display: block; }
-.card, .content-card, .header, .sidebar { background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(20px); border-radius: 20px; }
-.card { padding: 28px 22px; }
-h1 { font-size: 28px; font-weight: 800; margin-bottom: 6px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.screen.active { display: block; animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.card, .content-card, .header, .sidebar { background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; }
+.card { padding: 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02) inset; }
+h1 { font-size: 28px; font-weight: 800; margin-bottom: 6px; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
 h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
 h3::before { content: ''; width: 4px; height: 16px; background: var(--grad); border-radius: 2px; }
 .subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 22px; }
-input[type="text"], input[type="password"], input[type="number"] { width: 100%; padding: 15px 16px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; color: var(--text); margin-bottom: 12px; outline: none; font-family: inherit; }
-button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 10px; font-family: inherit; }
-.btn-primary { background: var(--grad); color: #000; }
+
+input[type="text"], input[type="password"], input[type="number"] { width: 100%; padding: 15px 16px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; color: var(--text); margin-bottom: 12px; outline: none; transition: all .2s; font-family: inherit; }
+input::placeholder { color: var(--text-dim); }
+input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
+
+button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s, filter .2s; margin-bottom: 10px; font-family: inherit; letter-spacing: 0.2px; }
+button:active { transform: scale(0.97); }
+.btn-primary { background: var(--grad); color: #000; box-shadow: 0 8px 24px rgba(0,229,255,0.25); }
+.btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border-strong); }
 .btn-success { background: linear-gradient(135deg, #00ffa3, #00b87a); color: #001810; }
 .btn-danger { background: linear-gradient(135deg, #ff3860, #b5003a); color: #fff; }
 .btn-warn { background: linear-gradient(135deg, #ffb800, #d98e00); color: #1a1200; }
+
 .toggle-text { text-align: center; color: var(--text-dim); font-size: 14px; margin-top: 8px; }
 .toggle-text a { color: var(--accent-1); cursor: pointer; font-weight: 600; text-decoration: none; }
 .error { color: var(--danger); font-size: 13px; margin-bottom: 10px; min-height: 18px; font-weight: 500; }
-.header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+
+.header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 .burger { width: 32px; height: 32px; display: flex; flex-direction: column; justify-content: center; gap: 5px; cursor: pointer; padding: 4px; }
 .burger span { display: block; height: 2.5px; background: var(--text); border-radius: 2px; }
-.user-name { font-weight: 700; color: var(--text); font-size: 14px; }
-.content-card { padding: 20px; margin-bottom: 14px; }
-.step-count { font-size: 46px; font-weight: 900; text-align: center; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.step-label { text-align: center; color: var(--text-dim); font-size: 12px; margin-bottom: 16px; text-transform: uppercase; }
+.user-name { font-weight: 700; color: var(--text); font-size: 14px; letter-spacing: 0.3px; }
+
+.content-card { padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.step-count { font-size: 46px; font-weight: 900; text-align: center; margin: 8px 0; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1.5px; line-height: 1; filter: drop-shadow(0 0 20px rgba(0,229,255,0.3)); }
+.step-label { text-align: center; color: var(--text-dim); font-size: 12px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; }
+
 .file-input-wrapper { position: relative; overflow: hidden; width: 100%; }
 .file-input-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
-.file-label { display: block; padding: 14px; background: var(--surface-2); border: 1px dashed var(--border-strong); color: var(--text); border-radius: 14px; text-align: center; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
+.file-label { display: block; padding: 14px; background: var(--surface-2); border: 1px dashed var(--border-strong); color: var(--text); border-radius: 14px; text-align: center; font-weight: 600; font-size: 14px; cursor: pointer; margin-bottom: 10px; }
 .preview-img { max-width: 100%; border-radius: 14px; margin-top: 10px; display: none; border: 1px solid var(--border); }
-.contest-item { padding: 14px; border: 1px solid var(--border); background: var(--bg-1); border-radius: 14px; margin-bottom: 10px; position: relative; }
+
+.contest-item { padding: 14px; border: 1px solid var(--border); background: var(--bg-1); border-radius: 14px; margin-bottom: 10px; position: relative; overflow: hidden; }
 .contest-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--grad); }
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 100; }
+.contest-item h4 { color: var(--text); font-size: 15px; margin-bottom: 6px; font-weight: 700; }
+.contest-item .meta { font-size: 13px; color: var(--text-dim); }
+.contest-item .prize { font-size: 13px; color: var(--accent-1); font-weight: 700; margin-top: 6px; }
+.soon-badge { display: inline-block; background: rgba(255,184,0,0.12); color: var(--warn); border: 1px solid rgba(255,184,0,0.3); font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 700; margin-top: 8px; }
+
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; z-index: 100; }
 .overlay.active { display: block; }
-.sidebar { position: fixed; top: 0; left: 0; width: 290px; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s; padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); }
+.sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1); padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); border-radius: 0 24px 24px 0; }
 .sidebar.active { transform: translateX(0); }
-.sidebar h2 { color: var(--text); margin-bottom: 24px; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.menu-item { padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; font-weight: 600; color: var(--text); }
-.menu-item:hover { background: var(--surface-2); border-color: var(--accent-1); }
+.sidebar h2 { color: var(--text); margin-bottom: 24px; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.menu-item { padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; font-weight: 600; color: var(--text); font-size: 15px; }
+.menu-item:hover { background: var(--surface-2); border-color: var(--accent-1); transform: translateX(3px); }
+.menu-item.danger { background: rgba(255,56,96,0.1); border-color: rgba(255,56,96,0.3); color: var(--danger); }
 .close-x { position: absolute; top: 20px; right: 20px; font-size: 20px; cursor: pointer; color: var(--text-dim); background: var(--surface); border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 50%; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; }
+
 .report-item { padding: 14px; border-radius: 14px; margin-bottom: 10px; background: var(--bg-1); border: 1px solid var(--border); border-left: 3px solid var(--border-strong); }
 .report-item.approved { border-left-color: var(--success); }
 .report-item.rejected { border-left-color: var(--danger); }
 .report-item.pending { border-left-color: var(--warn); }
-.report-status { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+.report-status { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
+.report-item.approved .report-status { color: var(--success); }
+.report-item.rejected .report-status { color: var(--danger); }
+.report-item.pending .report-status { color: var(--warn); }
+.report-steps { font-size: 16px; font-weight: 700; color: var(--text); }
+.report-date { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
 .rating-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid var(--border); }
 .rating-row:last-child { border-bottom: none; }
-.rating-pos { width: 38px; font-weight: 800; color: var(--text-dim); }
-.rating-name { flex: 1; font-weight: 600; color: var(--text); }
-.rating-steps { font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.empty-state { text-align: center; color: var(--text-dim); padding: 40px 20px; }
+.rating-pos { width: 38px; font-weight: 800; color: var(--text-dim); font-size: 15px; }
+.rating-row.top1 .rating-pos { color: #ffd700; }
+.rating-row.top2 .rating-pos { color: #c0c0c0; }
+.rating-row.top3 .rating-pos { color: #cd7f32; }
+.rating-name { flex: 1; font-weight: 600; color: var(--text); font-size: 15px; }
+.rating-steps { font-weight: 800; font-size: 15px; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+.empty-state { text-align: center; color: var(--text-dim); padding: 40px 20px; font-size: 14px; line-height: 1.6; }
+
+.admin-contest { padding: 14px; border-radius: 12px; background: var(--bg-1); margin-bottom: 10px; border: 1px solid var(--border); border-left: 3px solid var(--accent-2); display: flex; justify-content: space-between; align-items: center; }
 .admin-report { padding: 14px; border-radius: 14px; background: var(--bg-1); margin-bottom: 12px; border: 1px solid var(--border); }
+.admin-report .report-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--text); }
 .admin-report img { max-width: 100%; border-radius: 10px; margin: 10px 0; border: 1px solid var(--border); }
 .action-row { display: flex; gap: 8px; }
 .action-row button { flex: 1; padding: 11px; font-size: 13px; margin: 0; }
 .badge-role { display: inline-block; background: var(--grad); color: #000; font-size: 10px; padding: 3px 8px; border-radius: 8px; margin-left: 8px; font-weight: 800; }
+
+.danger-zone { border: 1px solid rgba(255,56,96,0.3); background: rgba(255,56,96,0.05); border-radius: 14px; padding: 16px; }
+.danger-zone h3::before { background: linear-gradient(135deg, #ff3860, #b5003a); }
+.user-admin-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; gap: 8px; }
+.user-admin-name { font-weight: 700; font-size: 14px; flex: 1; min-width: 0; }
+.user-admin-name small { display: block; color: var(--text-dim); font-weight: 500; font-size: 11px; margin-top: 2px; }
+.user-admin-steps { font-size: 13px; font-weight: 700; color: var(--accent-1); white-space: nowrap; }
+.mini-btn { width: auto; padding: 7px 10px; font-size: 12px; margin: 0; border-radius: 8px; min-width: 34px; }
+.steps-edit-row { display: flex; gap: 6px; align-items: center; }
+.steps-edit-row input { width: 70px; padding: 7px 10px; font-size: 13px; margin: 0; border-radius: 8px; }
+
+.info-block { padding: 16px; background: var(--bg-1); border-radius: 14px; border: 1px solid var(--border); margin-bottom: 12px; }
+.info-block h4 { color: var(--accent-1); font-size: 14px; margin-bottom: 8px; font-weight: 700; }
+.info-block p, .info-block ul { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
+.info-block ul { padding-left: 20px; }
 </style>
 </head>
 <body>
@@ -99,7 +159,7 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
     <input type="text" id="regName" placeholder="Ваше имя" autocomplete="off">
     <input type="text" id="regBracelet" placeholder="Название браслета / часов" autocomplete="off">
     <input type="password" id="regPassword" placeholder="Пароль" autocomplete="off">
-    <button class="btn-primary" onclick="handleAuth()">Зарегистрироваться</button>
+    <button class="btn-primary" id="authBtn" onclick="handleAuth()">Зарегистрироваться</button>
     <div class="toggle-text"><span id="togglePrompt">Уже есть аккаунт?</span> <a onclick="toggleAuth()" id="toggleLink">Войти</a></div>
   </div>
 </div>
@@ -119,17 +179,33 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
   <div class="content-card"><div id="ratingList"></div></div>
 </div>
 
+<div class="screen" id="infoScreen">
+  <div class="header"><div class="burger" onclick="openMenu()"><span></span><span></span><span></span></div><div class="user-name">Информация</div><div style="width:32px"></div></div>
+  <div class="content-card">
+    <div class="info-block"><h4>О приложении</h4><p>StepTrack Cloud — платформа для отслеживания активности. Данные синхронизируются через облако.</p></div>
+    <div class="info-block"><h4>Как участвовать</h4><ul><li>Введите количество пройденных шагов</li><li>Прикрепите скриншот из приложения-трекера</li><li>Отправьте отчёт на проверку</li><li>После одобрения шаги попадут в рейтинг</li></ul></div>
+    <div class="info-block"><h4>Правила</h4><p>Принимаются только настоящие скриншоты с вашего устройства. Подделка данных ведёт к блокировке аккаунта. Один отчёт — одно начисление.</p></div>
+    <div class="info-block"><h4>Контакты</h4><p>По всем вопросам: <strong style="color:var(--accent-1)">support@steptrack.app</strong></p></div>
+  </div>
+</div>
+
 <div class="screen" id="adminScreen">
   <div class="header"><div class="burger" onclick="openMenu()"><span></span><span></span><span></span></div><div class="user-name">Админ <span class="badge-role">ADMIN</span></div><div style="width:32px"></div></div>
   <div class="content-card">
     <h3>Создать конкурс</h3>
-    <input type="text" id="contestTitle" placeholder="Название">
+    <input type="text" id="contestTitle" placeholder="Название конкурса">
     <input type="text" id="contestGoal" placeholder="Цель">
     <input type="text" id="contestPrize" placeholder="Приз">
-    <button class="btn-primary" onclick="createContest()">Создать</button>
+    <button class="btn-primary" onclick="createContest()">Создать конкурс</button>
   </div>
-  <div class="content-card"><h3>Отчёты</h3><div id="adminReportsList"></div></div>
-  <div class="content-card"><h3>Юзеры</h3><div id="adminUsersList"></div></div>
+  <div class="content-card"><h3>Активные конкурсы</h3><div id="adminContestsList"></div></div>
+  <div class="content-card"><h3>Отчёты на проверку</h3><div id="adminReportsList"></div></div>
+  <div class="content-card"><h3>Управление пользователями</h3><div id="adminUsersList"></div></div>
+  <div class="content-card danger-zone">
+    <h3>Опасная зона</h3>
+    <button class="btn-warn" onclick="resetRating()">🔄 Очистить рейтинг (обнулить шаги)</button>
+    <button class="btn-danger" onclick="fullReset()">💣 Полный сброс</button>
+  </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeMenu()"></div>
@@ -139,8 +215,9 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
   <div class="menu-item" onclick="nav('main')">🏠 Главная</div>
   <div class="menu-item" onclick="nav('reports')">📋 Мои отчёты</div>
   <div class="menu-item" onclick="nav('rating')">🏆 Рейтинг</div>
+  <div class="menu-item" onclick="nav('info')">ℹ️ Информация</div>
   <div class="menu-item" id="adminMenuItem" style="display:none" onclick="nav('admin')">🛠 Админ-панель</div>
-  <div class="menu-item" onclick="logout()">🚪 Выйти</div>
+  <div class="menu-item danger" onclick="logout()">🚪 Выйти</div>
 </div>
 
 <script>
@@ -171,8 +248,10 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
 
     API.onValue(API.ref(API.db, 'contests'), (snap) => {
       const data = snap.val() || {};
-      contests = Object.values(data);
+      // Сохраняем ID конкурса для удаления
+      contests = Object.keys(data).map(k => ({ id: k, ...data[k] }));
       if (session && !session.isAdmin) updateMainIfActive();
+      if (session && session.isAdmin && document.getElementById('adminScreen').classList.contains('active')) renderAdmin();
     });
 
     API.onValue(API.ref(API.db, 'reports'), (snap) => {
@@ -182,13 +261,10 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
       if (session && session.isAdmin && document.getElementById('adminScreen').classList.contains('active')) renderAdmin();
     });
 
-    // ГЛАВНОЕ ИЗМЕНЕНИЕ: берем токен сессии из URL. 
-    // Если URL чистый - мы не авторизованы. Это создает независимые сессии для каждой вкладки.
     const urlParams = new URLSearchParams(window.location.search);
     const sessionToken = urlParams.get('session');
     
     if (sessionToken) {
-      // Если в URL есть токен, восстанавливаем сессию
       API.get(API.ref(API.db, 'sessions/' + sessionToken)).then((snapshot) => {
         if (snapshot.exists()) {
           session = snapshot.val();
@@ -217,6 +293,7 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
   }
 
   function handleAuth() {
@@ -246,11 +323,9 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
       userSession = { bracelet: u.bracelet, isAdmin: false, name: u.name };
     }
 
-    // Создаем уникальный токен сессии и пишем его в Firebase
     const newSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
     API.set(API.ref(API.db, 'sessions/' + newSessionToken), userSession).then(() => {
       session = userSession;
-      // Сохраняем токен в URL. Теперь эта вкладка привязана к этой сессии!
       window.history.replaceState(null, '', '?session=' + newSessionToken);
       enterApp();
     });
@@ -263,7 +338,6 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
   }
 
   function logout() {
-    // Удаляем сессию из Firebase и очищаем URL
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('session');
     if (token) API.remove(API.ref(API.db, 'sessions/' + token));
@@ -282,27 +356,31 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
     if (page === 'main') { renderMain(); showScreen('mainScreen'); }
     else if (page === 'reports') { renderReports(); showScreen('reportsScreen'); }
     else if (page === 'rating') { renderRating(); showScreen('ratingScreen'); }
+    else if (page === 'info') { showScreen('infoScreen'); }
     else if (page === 'admin' && session?.isAdmin) { renderAdmin(); showScreen('adminScreen'); }
   }
 
   function renderMain() {
     const user = users.find(u => u.bracelet === session.bracelet);
     const totalSteps = user ? (user.steps || 0) : 0;
-    const contestsHtml = contests.length ? contests.map(c => `<div class="contest-item"><h4>${c.title}</h4><div class="meta">Цель: ${c.goal}</div></div>`).join('') : '<div class="empty-state">Нет конкурсов</div>';
+
+    const contestsHtml = contests.length
+      ? contests.map(c => `<div class="contest-item"><h4>${escapeHtml(c.title)}</h4><div class="meta">Цель: ${escapeHtml(c.goal)}</div><div class="prize">🎁 ${escapeHtml(c.prize)}</div><div class="soon-badge">Скоро будет выбран победитель</div></div>`).join('')
+      : '<div class="empty-state">Пока нет активных конкурсов</div>';
 
     document.getElementById('mainContent').innerHTML = `
       <div class="content-card">
         <h3>Мои шаги</h3>
         <div class="step-count">${totalSteps.toLocaleString('ru-RU')}</div>
         <div class="step-label">всего одобрено</div>
-        <input type="number" id="stepsInput" placeholder="Введите шаги">
-        <button class="btn-primary" onclick="saveSteps()">📥 Загрузить</button>
+        <input type="number" id="stepsInput" placeholder="Введите количество шагов">
+        <button class="btn-primary" onclick="saveSteps()">📥 Загрузить шаги</button>
         <div class="file-input-wrapper">
-          <label class="file-label" for="screenshotInput">🖼 Скриншот</label>
+          <label class="file-label" for="screenshotInput">🖼 Выбрать скриншот</label>
           <input type="file" id="screenshotInput" accept="image/*" onchange="handleScreenshot(event)">
         </div>
         <img id="previewImg" class="preview-img">
-        <button class="btn-success" style="margin-top:10px;" onclick="submitReport()">📤 Отправить</button>
+        <button class="btn-success" style="margin-top:10px;" onclick="submitReport()">📤 Отправить на проверку</button>
       </div>
       <div class="content-card"><h3>Конкурсы</h3>${contestsHtml}</div>
     `;
@@ -312,7 +390,7 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
     const v = parseInt(document.getElementById('stepsInput').value);
     if (isNaN(v) || v <= 0) { alert('Введите шаги'); return; }
     currentSteps = v;
-    alert('Шаги сохранены.');
+    alert('Шаги сохранены. Теперь выберите скриншот и отправьте на проверку.');
   }
 
   function handleScreenshot(e) {
@@ -329,76 +407,177 @@ button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-siz
   }
 
   function submitReport() {
-    if (!currentSteps || currentSteps <= 0) { alert('Введите шаги'); return; }
+    if (!currentSteps || currentSteps <= 0) { alert('Сначала введите шаги'); return; }
     if (!currentScreenshot) { alert('Выберите скриншот'); return; }
 
     const newReportRef = API.push(API.ref(API.db, 'reports'));
-    API.set(newReportRef, { user: session.name, bracelet: session.bracelet, steps: currentSteps, screenshot: currentScreenshot, status: 'pending', createdAt: new Date().toISOString() });
+    API.set(newReportRef, {
+      user: session.name,
+      bracelet: session.bracelet,
+      steps: currentSteps,
+      screenshot: currentScreenshot,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    });
 
     currentSteps = 0;
     currentScreenshot = null;
-    alert('Отчёт отправлен!');
+    alert('Отчёт отправлен на сервер!');
     renderMain();
   }
 
   function renderReports() {
     const mine = reports.filter(r => r.bracelet === session.bracelet).reverse();
     const el = document.getElementById('reportsList');
-    if (!mine.length) { el.innerHTML = '<div class="empty-state">Нет отчётов</div>'; return; }
-    el.innerHTML = mine.map(r => `<div class="report-item ${r.status}"><div class="report-status">${r.status}</div><div class="report-steps">${r.steps.toLocaleString('ru-RU')} шагов</div></div>`).join('');
+    if (!mine.length) { el.innerHTML = '<div class="empty-state">У вас пока нет отчётов</div>'; return; }
+    const labels = { pending: 'На проверке', approved: 'Одобрено', rejected: 'Отклонено' };
+    el.innerHTML = mine.map(r => `<div class="report-item ${r.status}"><div class="report-status">${labels[r.status]}</div><div class="report-steps">${r.steps.toLocaleString('ru-RU')} шагов</div><div class="report-date">${new Date(r.createdAt).toLocaleString('ru-RU')}</div></div>`).join('');
   }
 
   function renderRating() {
     const arr = users.filter(u => u.steps > 0).sort((a, b) => b.steps - a.steps);
     const el = document.getElementById('ratingList');
-    if (!arr.length) { el.innerHTML = '<div class="empty-state">Рейтинг пуст</div>'; return; }
-    el.innerHTML = arr.map((u, i) => `<div class="rating-row"><div class="rating-pos">#${i + 1}</div><div class="rating-name">${u.name}</div><div class="rating-steps">${u.steps.toLocaleString('ru-RU')}</div></div>`).join('');
+    if (!arr.length) { el.innerHTML = '<div class="empty-state">Рейтинг пуст.<br>Станьте первым!</div>'; return; }
+    el.innerHTML = arr.map((u, i) => {
+      const cls = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+      return `<div class="rating-row ${cls}"><div class="rating-pos">#${i + 1}</div><div class="rating-name">${escapeHtml(u.name)}</div><div class="rating-steps">${u.steps.toLocaleString('ru-RU')}</div></div>`;
+    }).join('');
   }
 
   function renderAdmin() {
-    const pending = reports.filter(r => r.status === 'pending');
-    document.getElementById('adminReportsList').innerHTML = !pending.length ? '<div class="empty-state">Нет отчётов</div>' : pending.map(r => `
-      <div class="admin-report">
-        <div style="font-size:13px; margin-bottom:8px;"><strong>${r.user}</strong> (${r.bracelet})</div>
-        <div style="color:var(--accent-1); font-weight:700;">${r.steps} шагов</div>
-        ${r.screenshot ? `<img src="${r.screenshot}">` : ''}
-        <div class="action-row">
-          <button class="btn-success" onclick="reviewReport('${r.id}', 'approved')">✓ Да</button>
-          <button class="btn-danger" onclick="reviewReport('${r.id}', 'rejected')">✕ Нет</button>
-        </div>
-      </div>`).join('');
+    // 1. Вывод конкурсов с кнопкой удаления
+    const cl = document.getElementById('adminContestsList');
+    cl.innerHTML = contests.length
+      ? contests.map(c => `
+        <div class="admin-contest">
+          <div>
+            <strong>${escapeHtml(c.title)}</strong><br>
+            <small style="color:var(--text-dim);">Цель: ${escapeHtml(c.goal)} • Приз: ${escapeHtml(c.prize)}</small>
+          </div>
+          <button class="btn-danger mini-btn" onclick="deleteContest('${c.id}')">🗑 Удалить</button>
+        </div>`).join('')
+      : '<div class="empty-state">Конкурсов нет</div>';
 
-    document.getElementById('adminUsersList').innerHTML = users.map(u => `
-      <div class="user-admin-row">
-        <div class="user-admin-name">${u.name}<br><small>${u.bracelet}</small></div>
-        <div class="user-admin-steps">${(u.steps||0)}</div>
-        <button class="btn-danger mini-btn" onclick="deleteUser('${u.bracelet}')">🗑</button>
-      </div>`).join('');
+    // 2. Отчеты на проверку
+    const rl = document.getElementById('adminReportsList');
+    const pending = reports.filter(r => r.status === 'pending');
+    if (!pending.length) {
+      rl.innerHTML = '<div class="empty-state">Нет отчётов на проверку</div>';
+    } else {
+      rl.innerHTML = pending.map(r => `
+        <div class="admin-report">
+          <div class="report-header"><strong>${escapeHtml(r.user)}</strong><span style="color:var(--text-dim);">${escapeHtml(r.bracelet)}</span></div>
+          <div style="font-size:15px;font-weight:700;color:var(--accent-1);">${r.steps.toLocaleString('ru-RU')} шагов</div>
+          ${r.screenshot ? `<img src="${r.screenshot}" alt="скриншот">` : ''}
+          <div class="action-row">
+            <button class="btn-success" onclick="reviewReport('${r.id}', 'approved')">✓ Одобрить</button>
+            <button class="btn-danger" onclick="reviewReport('${r.id}', 'rejected')">✕ Отклонить</button>
+          </div>
+        </div>`).join('');
+    }
+
+    // 3. Пользователи (с возможностью менять шаги)
+    const ul = document.getElementById('adminUsersList');
+    if (!users.length) {
+      ul.innerHTML = '<div class="empty-state">Пользователей нет</div>';
+    } else {
+      ul.innerHTML = users.map(u => `
+        <div class="user-admin-row">
+          <div class="user-admin-name">${escapeHtml(u.name)}<small>${escapeHtml(u.bracelet)}</small></div>
+          <div class="user-admin-steps">${(u.steps||0).toLocaleString('ru-RU')}</div>
+          <div class="steps-edit-row">
+            <input type="number" placeholder="±шаги" id="adj_${btoa(u.bracelet)}">
+            <button class="btn-secondary mini-btn" onclick="adjustSteps('${escapeAttr(u.bracelet)}', '${btoa(u.bracelet)}')">±</button>
+            <button class="btn-danger mini-btn" onclick="deleteUser('${escapeAttr(u.bracelet)}')">🗑</button>
+          </div>
+        </div>`).join('');
+    }
   }
 
   function createContest() {
     const title = document.getElementById('contestTitle').value.trim();
-    if (!title) return;
-    const newRef = API.push(API.ref(API.db, 'contests'));
-    API.set(newRef, { title, createdAt: new Date().toISOString() });
+    const goal  = document.getElementById('contestGoal').value.trim();
+    const prize = document.getElementById('contestPrize').value.trim();
+    if (!title || !goal || !prize) { alert('Заполните все поля'); return; }
+    
+    const newContestRef = API.push(API.ref(API.db, 'contests'));
+    API.set(newContestRef, { title, goal, prize, createdAt: new Date().toISOString() });
+    
+    document.getElementById('contestTitle').value = '';
+    document.getElementById('contestGoal').value = '';
+    document.getElementById('contestPrize').value = '';
+    renderAdmin();
+  }
+
+  function deleteContest(id) {
+    if (!confirm('Удалить этот конкурс? (Это не затронет аккаунты и шаги)')) return;
+    API.remove(API.ref(API.db, 'contests/' + id));
     renderAdmin();
   }
 
   function reviewReport(id, status) {
     const r = reports.find(x => x.id === id);
     if (!r) return;
+    
     API.update(API.ref(API.db, 'reports/' + id), { status: status });
+    
     if (status === 'approved') {
       const u = users.find(x => x.bracelet === r.bracelet);
-      if (u) API.update(API.ref(API.db, 'users/' + u.bracelet), { steps: (u.steps || 0) + r.steps });
+      if (u) {
+        const currentSteps = u.steps || 0;
+        API.update(API.ref(API.db, 'users/' + u.bracelet), { steps: currentSteps + r.steps });
+      }
     }
     renderAdmin();
   }
 
-  function deleteUser(bracelet) {
-    if (!confirm('Удалить?')) return;
-    API.remove(API.ref(API.db, 'users/' + bracelet));
+  function adjustSteps(bracelet, encoded) {
+    const input = document.getElementById('adj_' + encoded);
+    const delta = parseInt(input.value);
+    if (isNaN(delta) || delta === 0) { alert('Введите число'); return; }
+    const u = users.find(x => x.bracelet === bracelet);
+    if (!u) return;
+    
+    const newSteps = Math.max(0, (u.steps || 0) + delta);
+    API.update(API.ref(API.db, 'users/' + bracelet), { steps: newSteps });
     renderAdmin();
+  }
+
+  function deleteUser(bracelet) {
+    if (!confirm(`Удалить пользователя «${bracelet}»?`)) return;
+    API.remove(API.ref(API.db, 'users/' + bracelet));
+    reports.filter(r => r.bracelet === bracelet).forEach(r => {
+      API.remove(API.ref(API.db, 'reports/' + r.id));
+    });
+    renderAdmin();
+  }
+
+  function resetRating() {
+    if (!confirm('Обнулить шаги всех пользователей?')) return;
+    users.forEach(u => {
+      API.update(API.ref(API.db, 'users/' + u.bracelet), { steps: 0 });
+    });
+    alert('Рейтинг очищен');
+    renderAdmin();
+  }
+
+  function fullReset() {
+    if (!confirm('⚠️ ПОЛНЫЙ СБРОС всех данных (включая аккаунты)?')) return;
+    if (!confirm('Точно? Это необратимо.')) return;
+    
+    API.remove(API.ref(API.db, 'users'));
+    API.remove(API.ref(API.db, 'contests'));
+    API.remove(API.ref(API.db, 'reports'));
+    
+    window.history.replaceState(null, '', window.location.pathname);
+    location.reload();
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(s) {
+    return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
   }
 </script>
 </body>
