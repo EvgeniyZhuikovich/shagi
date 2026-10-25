@@ -28,6 +28,7 @@
 </script>
 
 <style>
+/* Стили оставлены прежними, они рабочие */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
   --bg-0: #0a0a0f; --bg-1: #12121c; --bg-2: #1a1a28;
@@ -39,17 +40,7 @@
   --grad: linear-gradient(135deg, #00e5ff 0%, #b500ff 100%);
 }
 html, body { min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
-body { 
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-  background: var(--bg-0); 
-  color: var(--text); 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 20px;
-  position: relative;
-}
-
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-0); color: var(--text); display: flex; flex-direction: column; align-items: center; padding-bottom: 20px; position: relative; }
 body::before, body::after { content: ''; position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.35; z-index: 0; pointer-events: none; animation: float 14s ease-in-out infinite; }
 body::before { width: 300px; height: 300px; background: var(--accent-2); top: -100px; left: -100px; }
 body::after { width: 400px; height: 400px; background: var(--accent-1); bottom: -150px; right: -150px; animation-delay: -7s; }
@@ -59,7 +50,6 @@ body::after { width: 400px; height: 400px; background: var(--accent-1); bottom: 
 .screen.active { display: block; animation: fadeIn .25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* Экран входа - центрируем */
 #authScreen { display: none; padding-top: 40px; }
 #authScreen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
 
@@ -332,23 +322,21 @@ button:active { transform: scale(0.97); }
       userSession = { bracelet: u.bracelet, isAdmin: false, name: u.name };
     }
 
-    // Генерируем токен и сохраняем в Firebase
     const newSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    
+    // Сохраняем в Firebase и переключаем экран
     API.set(API.ref(API.db, 'sessions/' + newSessionToken), userSession).then(() => {
       session = userSession;
       window.history.replaceState(null, '', '?session=' + newSessionToken);
-      
-      // ПРИНУДИТЕЛЬНЫЙ ПЕРЕХОД
       enterApp();
     }).catch(err => {
-      alert('Ошибка сохранения сессии: ' + err.message);
+      errEl.textContent = 'Ошибка входа: ' + err.message;
     });
   }
 
   function enterApp() {
     document.getElementById('headerName').textContent = session.name || session.bracelet;
     document.getElementById('adminMenuItem').style.display = session.isAdmin ? 'block' : 'none';
-    // Сначала принудительно показываем экран, потом рендерим
     nav(session.isAdmin ? 'admin' : 'main');
   }
 
@@ -493,13 +481,14 @@ button:active { transform: scale(0.97); }
     if (!users.length) {
       ul.innerHTML = '<div class="empty-state">Пользователей нет</div>';
     } else {
-      ul.innerHTML = users.map(u => `
+      // ИСПРАВЛЕНИЕ: Используем обычный индекс вместо btoa() для кириллицы
+      ul.innerHTML = users.map((u, i) => `
         <div class="user-admin-row">
           <div class="user-admin-name">${escapeHtml(u.name)}<small>${escapeHtml(u.bracelet)}</small></div>
           <div class="user-admin-steps">${(u.steps||0).toLocaleString('ru-RU')}</div>
           <div class="steps-edit-row">
-            <input type="number" placeholder="±шаги" id="adj_${btoa(u.bracelet)}">
-            <button class="btn-secondary mini-btn" onclick="adjustSteps('${escapeAttr(u.bracelet)}', '${btoa(u.bracelet)}')">±</button>
+            <input type="number" placeholder="±шаги" id="adj_${i}">
+            <button class="btn-secondary mini-btn" onclick="adjustSteps('${escapeAttr(u.bracelet)}', '${i}')">±</button>
             <button class="btn-danger mini-btn" onclick="deleteUser('${escapeAttr(u.bracelet)}')">🗑</button>
           </div>
         </div>`).join('');
@@ -543,8 +532,8 @@ button:active { transform: scale(0.97); }
     renderAdmin();
   }
 
-  function adjustSteps(bracelet, encoded) {
-    const input = document.getElementById('adj_' + encoded);
+  function adjustSteps(bracelet, index) {
+    const input = document.getElementById('adj_' + index);
     const delta = parseInt(input.value);
     if (isNaN(delta) || delta === 0) { alert('Введите число'); return; }
     const u = users.find(x => x.bracelet === bracelet);
