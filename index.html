@@ -38,8 +38,6 @@
   --success: #00ffa3; --danger: #ff3860; --warn: #ffb800;
   --grad: linear-gradient(135deg, #00e5ff 0%, #b500ff 100%);
 }
-
-/* ИСПРАВЛЕНИЕ: Убираем жесткое центрирование и разрешаем скролл */
 html, body { min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
 body { 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
@@ -61,9 +59,9 @@ body::after { width: 400px; height: 400px; background: var(--accent-1); bottom: 
 .screen.active { display: block; animation: fadeIn .25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* Экран входа */
+/* Экран входа - центрируем */
 #authScreen { display: none; padding-top: 40px; }
-#authScreen.active { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; }
+#authScreen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
 
 .card, .content-card, .header, .sidebar { background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; }
 .card { width: 100%; padding: 24px 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
@@ -88,23 +86,10 @@ button:active { transform: scale(0.97); }
 .toggle-text a { color: var(--accent-1); cursor: pointer; font-weight: 600; text-decoration: none; }
 .error { color: var(--danger); font-size: 13px; margin-bottom: 10px; min-height: 18px; font-weight: 500; }
 
-/* ИСПРАВЛЕНИЕ: Шапка теперь sticky и всегда прилипает к верху */
-.header { 
-  position: sticky; 
-  top: 0; 
-  z-index: 99;
-  padding: 12px 16px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  margin-bottom: 14px; 
-  background: var(--bg-1); /* Фон нужен, чтобы контент не просвечивал при прокрутке */
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  border-radius: 20px;
-}
+.header { position: sticky; top: 0; z-index: 99; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; background: var(--bg-1); box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-radius: 20px; }
 .burger { width: 32px; height: 32px; display: flex; flex-direction: column; justify-content: center; gap: 5px; cursor: pointer; padding: 4px; }
 .burger span { display: block; height: 2.5px; background: var(--text); border-radius: 2px; }
-.user-name { font-weight: 700; color: var(--text); font-size: 14px; }
+.user-name { font-weight: 700; color: var(--text); font-size: 14px; text-align: center; flex: 1; }
 
 .content-card { padding: 18px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 .step-count { font-size: 42px; font-weight: 900; text-align: center; margin: 8px 0; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; filter: drop-shadow(0 0 20px rgba(0,229,255,0.3)); }
@@ -124,7 +109,7 @@ button:active { transform: scale(0.97); }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; z-index: 100; }
 .overlay.active { display: block; }
-.sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1); padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); }
+.sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1); padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); border-radius: 0 24px 24px 0; }
 .sidebar.active { transform: translateX(0); }
 .sidebar h2 { color: var(--text); margin-bottom: 24px; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .menu-item { padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; font-weight: 600; color: var(--text); font-size: 15px; }
@@ -165,7 +150,6 @@ button:active { transform: scale(0.97); }
 .info-block p, .info-block ul { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
 .info-block ul { padding-left: 20px; }
 
-/* Мобильная адаптация */
 @media (max-width: 480px) {
   .card { padding: 20px 16px; }
   h1 { font-size: 24px; }
@@ -210,7 +194,7 @@ button:active { transform: scale(0.97); }
   <div class="content-card">
     <div class="info-block"><h4>О приложении</h4><p>StepTrack Cloud — платформа для отслеживания активности. Данные синхронизируются через облако.</p></div>
     <div class="info-block"><h4>Как участвовать</h4><ul><li>Введите количество пройденных шагов</li><li>Прикрепите скриншот из приложения-трекера</li><li>Отправьте отчёт на проверку</li><li>После одобрения шаги попадут в рейтинг</li></ul></div>
-    <div class="info-block"><h4>Правила</h4><p>Принимаются только настоящие скриншоты с вашего устройства. Подделка данных ведёт к блокировке аккаунта. Один отчёт — одно начисление.</p></div>
+    <div class="info-block"><h4>Правила</h4><p>Принимаются только настоящие скриншоты с вашего устройства. Подделка данных ведёт к блокировке аккаунта.</p></div>
     <div class="info-block"><h4>Контакты</h4><p>По всем вопросам: <strong style="color:var(--accent-1)">support@steptrack.app</strong></p></div>
   </div>
 </div>
@@ -229,7 +213,7 @@ button:active { transform: scale(0.97); }
   <div class="content-card"><h3>Управление пользователями</h3><div id="adminUsersList"></div></div>
   <div class="content-card danger-zone">
     <h3>Опасная зона</h3>
-    <button class="btn-warn" onclick="resetRating()">🔄 Очистить рейтинг (обнулить шаги)</button>
+    <button class="btn-warn" onclick="resetRating()">🔄 Очистить рейтинг</button>
     <button class="btn-danger" onclick="fullReset()">💣 Полный сброс</button>
   </div>
 </div>
@@ -348,17 +332,23 @@ button:active { transform: scale(0.97); }
       userSession = { bracelet: u.bracelet, isAdmin: false, name: u.name };
     }
 
+    // Генерируем токен и сохраняем в Firebase
     const newSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
     API.set(API.ref(API.db, 'sessions/' + newSessionToken), userSession).then(() => {
       session = userSession;
       window.history.replaceState(null, '', '?session=' + newSessionToken);
+      
+      // ПРИНУДИТЕЛЬНЫЙ ПЕРЕХОД
       enterApp();
+    }).catch(err => {
+      alert('Ошибка сохранения сессии: ' + err.message);
     });
   }
 
   function enterApp() {
     document.getElementById('headerName').textContent = session.name || session.bracelet;
     document.getElementById('adminMenuItem').style.display = session.isAdmin ? 'block' : 'none';
+    // Сначала принудительно показываем экран, потом рендерим
     nav(session.isAdmin ? 'admin' : 'main');
   }
 
@@ -532,7 +522,7 @@ button:active { transform: scale(0.97); }
   }
 
   function deleteContest(id) {
-    if (!confirm('Удалить этот конкурс? (Это не затронет аккаунты и шаги)')) return;
+    if (!confirm('Удалить этот конкурс?')) return;
     API.remove(API.ref(API.db, 'contests/' + id));
     renderAdmin();
   }
