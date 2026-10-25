@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>StepTrack</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg-0: #0a0a0f;
+  --bg-1: #12121c;
+  --bg-2: #1a1a28;
+  --surface: rgba(255,255,255,0.04);
+  --surface-2: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.14);
+  --text: #f0f0f5;
+  --text-dim: #8a8aa0;
+  --accent-1: #00e5ff;
+  --accent-2: #b500ff;
+  --accent-3: #ff2d95;
+  --success: #00ffa3;
+  --danger: #ff3860;
+  --warn: #ffb800;
+  --grad: linear-gradient(135deg, #00e5ff 0%, #b500ff 100%);
+}
+
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-0);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* animated background orbs */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  z-index: 0;
+  pointer-events: none;
+  animation: float 14s ease-in-out infinite;
+}
+body::before {
+  width: 400px; height: 400px;
+  background: var(--accent-2);
+  top: -100px; left: -100px;
+}
+body::after {
+  width: 500px; height: 500px;
+  background: var(--accent-1);
+  bottom: -150px; right: -150px;
+  animation-delay: -7s;
+}
+@keyframes float {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(40px, 40px) scale(1.1); }
+}
+
+.screen { display: none; width: 100%; max-width: 500px; position: relative; z-index: 1; }
+.screen.active { display: block; animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Cards ---------- */
+.card, .content-card, .header, .sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+}
+
+.card {
+  padding: 28px 22px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02) inset;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+h3::before {
+  content: '';
+  width: 4px; height: 16px;
+  background: var(--grad);
+  border-radius: 2px;
+}
+.subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 22px; }
+
+input[type="text"], input[type="password"], input[type="number"] {
+  width: 100%;
+  padding: 15px 16px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 12px;
+  outline: none;
+  transition: all .2s;
+  font-family: inherit;
+}
+input::placeholder { color: var(--text-dim); }
+input:focus {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.12);
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .1s, filter .2s, box-shadow .2s;
+  margin-bottom: 10px;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+}
+button:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--grad);
+  color: #000;
+  box-shadow: 0 8px 24px rgba(0,229,255,0.25);
+}
+.btn-primary:hover { filter: brightness(1.1); }
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #00ffa3, #00b87a);
+  color: #001810;
+  box-shadow: 0 8px 24px rgba(0,255,163,0.2);
+}
+.btn-danger {
+  background: linear-gradient(135deg, #ff3860, #b5003a);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(255,56,96,0.2);
+}
+.btn-warn {
+  background: linear-gradient(135deg, #ffb800, #d98e00);
+  color: #1a1200;
+}
+
+.toggle-text { text-align: center; color: var(--text-dim); font-size: 14px; margin-top: 8px; }
+.toggle-text a { color: var(--accent-1); cursor: pointer; font-weight: 600; text-decoration: none; }
+.error { color: var(--danger); font-size: 13px; margin-bottom: 10px; min-height: 18px; font-weight: 500; }
+
+/* ---------- Header ---------- */
+.header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.burger {
+  width: 32px; height: 32px;
+  display: flex; flex-direction: column; justify-content: center; gap: 5px;
+  cursor: pointer; padding: 4px;
+}
+.burger span {
+  display: block; height: 2.5px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: background .2s;
+}
+.burger:hover span { background: var(--accent-1); }
+.user-name { font-weight: 700; color: var(--text); font-size: 14px; letter-spacing: 0.3px; }
+
+/* ---------- Content ---------- */
+.content-card {
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.step-count {
+  font-size: 46px;
+  font-weight: 900;
+  text-align: center;
+  margin: 8px 0;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1.5px;
+  line-height: 1;
+  filter: drop-shadow(0 0 20px rgba(0,229,255,0.3));
+}
+.step-label { text-align: center; color: var(--text-dim); font-size: 12px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; }
+
+.file-input-wrapper { position: relative; overflow: hidden; width: 100%; }
+.file-input-wrapper input[type=file] {
+  position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;
+}
+.file-label {
+  display: block;
+  padding: 14px;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-strong);
+  color: var(--text);
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all .2s;
+}
+.file-label:hover { border-color: var(--accent-1); background: rgba(0,229,255,0.05); }
+
+.preview-img {
+  max-width: 100%;
+  border-radius: 14px;
+  margin-top: 10px;
+  display: none;
+  border: 1px solid var(--border);
+}
+
+/* contest item */
+.contest-item {
+  padding: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-1);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.contest-item::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--grad);
+}
+.contest-item h4 { color: var(--text); font-size: 15px; margin-bottom: 6px; font-weight: 700; }
+.contest-item .meta { font-size: 13px; color: var(--text-dim); }
+.contest-item .prize { font-size: 13px; color: var(--accent-1); font-weight: 700; margin-top: 6px; }
+.soon-badge {
+  display: inline-block;
+  background: rgba(255,184,0,0.12);
+  color: var(--warn);
+  border: 1px solid rgba(255,184,0,0.3);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  margin-top: 8px;
+  letter-spacing: 0.3px;
+}
+
+/* ---------- Sidebar ---------- */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: none; z-index: 100;
+}
+.overlay.active { display: block; animation: fadeIn .2s; }
+
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 290px;
+  max-width: 85vw;
+  height: 100%;
+  background: var(--bg-1);
+  z-index: 101;
+  transform: translateX(-100%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  padding: 24px 20px;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  border-radius: 0 24px 24px 0;
+}
+.sidebar.active { transform: translateX(0); }
+.sidebar h2 {
+  color: var(--text);
+  margin-bottom: 24px;
+  font-size: 20px;
+  font-weight: 800;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.menu-item {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+  transition: all .2s;
+  font-size: 15px;
+}
+.menu-item:hover {
+  background: var(--surface-2);
+  border-color: var(--accent-1);
+  transform: translateX(3px);
+}
+.menu-item.danger {
+  background: rgba(255,56,96,0.1);
+  border-color: rgba(255,56,96,0.3);
+  color: var(--danger);
+}
+.menu-item.danger:hover { background: rgba(255,56,96,0.2); }
+
+.close-x {
+  position: absolute;
+  top: 20px; right: 20px;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  padding: 0; margin: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.close-x:hover { color: var(--text); border-color: var(--accent-1); }
+
+/* ---------- Reports ---------- */
+.report-item {
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+}
+.report-item.approved { border-left-color: var(--success); }
+.report-item.rejected { border-left-color: var(--danger); }
+.report-item.pending { border-left-color: var(--warn); }
+.report-status {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.report-item.approved .report-status { color: var(--success); }
+.report-item.rejected .report-status { color: var(--danger); }
+.report-item.pending .report-status { color: var(--warn); }
+.report-steps { font-size: 16px; font-weight: 700; color: var(--text); }
+.report-date { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+/* ---------- Rating ---------- */
+.rating-row {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.rating-row:last-child { border-bottom: none; }
+.rating-pos {
+  width: 38px;
+  font-weight: 800;
+  color: var(--text-dim);
+  font-size: 15px;
+}
+.rating-row.top1 .rating-pos { color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.5); }
+.rating-row.top2 .rating-pos { color: #c0c0c0; text-shadow: 0 0 12px rgba(192,192,192,0.4); }
+.rating-row.top3 .rating-pos { color: #cd7f32; text-shadow: 0 0 12px rgba(205,127,50,0.4); }
+.rating-name { flex: 1; font-weight: 600; color: var(--text); font-size: 15px; }
+.rating-steps {
+  font-weight: 800;
+  font-size: 15px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 40px 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ---------- Admin ---------- */
+.admin-contest {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-1);
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-2);
+}
+.admin-report {
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--bg-1);
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.admin-report .report-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+.admin-report img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 10px 0;
+  border: 1px solid var(--border);
+}
+.action-row { display: flex; gap: 8px; }
+.action-row button { flex: 1; padding: 11px; font-size: 13px; margin: 0; }
+
+.badge-role {
+  display: inline-block;
+  background: var(--grad);
+  color: #000;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  margin-left: 8px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.danger-zone {
+  border: 1px solid rgba(255,56,96,0.3);
+  background: rgba(255,56,96,0.05);
+  border-radius: 14px;
+  padding: 16px;
+}
+.danger-zone h3::before { background: linear-gradient(135deg, #ff3860, #b5003a); }
+
+.user-admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+.user-admin-name { font-weight: 700; font-size: 14px; flex: 1; min-width: 0; }
+.user-admin-name small { display: block; color: var(--text-dim); font-weight: 500; font-size: 11px; margin-top: 2px; }
+.user-admin-steps { font-size: 13px; font-weight: 700; color: var(--accent-1); white-space: nowrap; }
+.mini-btn {
+  width: auto;
+  padding: 7px 10px;
+  font-size: 12px;
+  margin: 0;
+  border-radius: 8px;
+  min-width: 34px;
+}
+.steps-edit-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.steps-edit-row input {
+  width: 70px;
+  padding: 7px 10px;
+  font-size: 13px;
+  margin: 0;
+  border-radius: 8px;
+}
+
+/* info page */
+.info-block {
+  padding: 16px;
+  background: var(--bg-1);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.info-block h4 { color: var(--accent-1); font-size: 14px; margin-bottom: 8px; font-weight: 700; }
+.info-block p { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
+.info-block ul { color: var(--text-dim); font-size: 14px; line-height: 1.8; padding-left: 20px; }
+
+@media (max-width: 400px) {
+  .card { padding: 22px 18px; }
+  h1 { font-size: 24px; }
+  .step-count { font-size: 38px; }
+  .user-admin-row { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="screen active" id="authScreen">
+  <div class="card">
+    <h1 id="authTitle">Регистрация</h1>
+    <p class="subtitle" id="authSubtitle">Создайте аккаунт для участия в конкурсах</p>
+    <div class="error" id="authError"></div>
+    <input type="text" id="regName" placeholder="Ваше имя" autocomplete="off">
+    <input type="text" id="regBracelet" placeholder="Название браслета / часов" autocomplete="off">
+    <input type="password" id="regPassword" placeholder="Пароль" autocomplete="off">
+    <button class="btn-primary" id="authBtn" onclick="handleAuth()">Зарегистрироваться</button>
+    <div class="toggle-text">
+      <span id="togglePrompt">Уже есть аккаунт?</span>
+      <a onclick="toggleAuth()" id="toggleLink">Войти</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP SCREEN -->
+<div class="screen" id="mainScreen">
+  <div class="header">
+    <div class="burger" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="user-name" id="headerName">—</div>
+    <div style="width:32px"></div>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<!-- REPORTS SCREEN -->
+<div class="screen" id="reportsScreen">
+  <div class="header">
+    <div class="burger" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="user-name">Мои отчёты</div>
+    <div style="width:32px"></div>
+  </div>
+  <div class="content-card"><div id="reportsList"></div></div>
+</div>
+
+<!-- RATING SCREEN -->
+<div class="screen" id="ratingScreen">
+  <div class="header">
+    <div class="burger" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="user-name">Рейтинг</div>
+    <div style="width:32px"></div>
+  </div>
+  <div class="content-card"><div id="ratingList"></div></div>
+</div>
+
+<!-- INFO SCREEN -->
+<div class="screen" id="infoScreen">
+  <div class="header">
+    <div class="burger" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="user-name">Информация</div>
+    <div style="width:32px"></div>
+  </div>
+  <div class="content-card">
+    <div class="info-block">
+      <h4>О приложении</h4>
+      <p>StepTrack — платформа для отслеживания активности и участия в конкурсах по шагам. Загружайте свои результаты, соревнуйтесь с другими и выигрывайте призы.</p>
+    </div>
+    <div class="info-block">
+      <h4>Как участвовать</h4>
+      <ul>
+        <li>Введите количество пройденных шагов</li>
+        <li>Прикрепите скриншот из приложения-трекера</li>
+        <li>Отправьте отчёт на проверку</li>
+        <li>После одобрения шаги попадут в рейтинг</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>Правила</h4>
+      <p>Принимаются только настоящие скриншоты с вашего устройства. Подделка данных ведёт к блокировке аккаунта. Один отчёт — одно начисление.</p>
+    </div>
+    <div class="info-block">
+      <h4>Контакты</h4>
+      <p>По всем вопросам: <strong style="color:var(--accent-1)">support@steptrack.app</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div class="screen" id="adminScreen">
+  <div class="header">
+    <div class="burger" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="user-name">Админ <span class="badge-role">ADMIN</span></div>
+    <div style="width:32px"></div>
+  </div>
+
+  <div class="content-card">
+    <h3>Создать конкурс</h3>
+    <input type="text" id="contestTitle" placeholder="Название конкурса" autocomplete="off">
+    <input type="text" id="contestGoal" placeholder="Цель (например: 100 000 шагов)" autocomplete="off">
+    <input type="text" id="contestPrize" placeholder="Приз (например: Фитнес-браслет)" autocomplete="off">
+    <button class="btn-primary" onclick="createContest()">Создать конкурс</button>
+  </div>
+
+  <div class="content-card">
+    <h3>Активные конкурсы</h3>
+    <div id="adminContestsList"></div>
+  </div>
+
+  <div class="content-card">
+    <h3>Отчёты на проверку</h3>
+    <div id="adminReportsList"></div>
+  </div>
+
+  <div class="content-card">
+    <h3>Управление пользователями</h3>
+    <div id="adminUsersList"></div>
+  </div>
+
+  <div class="content-card danger-zone">
+    <h3>Опасная зона</h3>
+    <button class="btn-warn" onclick="resetRating()">🔄 Очистить рейтинг (обнулить шаги)</button>
+    <button class="btn-danger" onclick="fullReset()">💣 Полный сброс (всё удалить)</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+<div class="sidebar" id="sidebar">
+  <button class="close-x" onclick="closeMenu()">✕</button>
+  <h2>Меню</h2>
+  <div class="menu-item" onclick="nav('main')">🏠 Главная</div>
+  <div class="menu-item" onclick="nav('reports')">📋 Мои отчёты</div>
+  <div class="menu-item" onclick="nav('rating')">🏆 Рейтинг</div>
+  <div class="menu-item" onclick="nav('info')">ℹ️ Информация</div>
+  <div class="menu-item" id="adminMenuItem" style="display:none" onclick="nav('admin')">🛠 Админ-панель</div>
+  <div class="menu-item danger" onclick="logout()">🚪 Выйти</div>
+</div>
+
+<script>
+const DB = {
+  get: (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } },
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+let users    = DB.get('users', []);
+let contests = DB.get('contests', []);
+let reports  = DB.get('reports', []);
+let session  = DB.get('session', null);
+
+let isRegisterMode = true;
+let currentScreenshot = null;
+let currentSteps = 0;
+
+// ============ AUTH ============
+function toggleAuth() {
+  isRegisterMode = !isRegisterMode;
+  document.getElementById('authTitle').textContent = isRegisterMode ? 'Регистрация' : 'Вход';
+  document.getElementById('authSubtitle').textContent = isRegisterMode
+    ? 'Создайте аккаунт для участия в конкурсах' : 'Войдите в свой аккаунт';
+  document.getElementById('authBtn').textContent = isRegisterMode ? 'Зарегистрироваться' : 'Войти';
+  document.getElementById('togglePrompt').textContent = isRegisterMode ? 'Уже есть аккаунт?' : 'Нет аккаунта?';
+  document.getElementById('toggleLink').textContent = isRegisterMode ? 'Войти' : 'Зарегистрироваться';
+  document.getElementById('regPassword').style.display = isRegisterMode ? 'block' : 'none';
+  document.getElementById('authError').textContent = '';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function handleAuth() {
+  const name = document.getElementById('regName').value.trim();
+  const bracelet = document.getElementById('regBracelet').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const errEl = document.getElementById('authError');
+  errEl.textContent = '';
+
+  if (!name || !bracelet) { errEl.textContent = 'Заполните все поля'; return; }
+
+  if (bracelet.toLowerCase() === 'adminqwerty') {
+    session = { bracelet: 'admin', isAdmin: true, name: 'Администратор' };
+    DB.set('session', session);
+    enterApp();
+    return;
+  }
+
+  if (isRegisterMode) {
+    if (users.find(u => u.bracelet.toLowerCase() === bracelet.toLowerCase())) {
+      errEl.textContent = 'Этот браслет уже зарегистрирован'; return;
+    }
+    if (password.length < 3) { errEl.textContent = 'Пароль минимум 3 символа'; return; }
+    users.push({ name, bracelet, password, steps: 0 });
+    DB.set('users', users);
+    session = { bracelet, isAdmin: false, name };
+    DB.set('session', session);
+    enterApp();
+  } else {
+    const u = users.find(x => x.bracelet.toLowerCase() === bracelet.toLowerCase() && x.password === password);
+    if (!u) { errEl.textContent = 'Неверный браслет или пароль'; return; }
+    session = { bracelet: u.bracelet, isAdmin: false, name: u.name };
+    DB.set('session', session);
+    enterApp();
+  }
+}
+
+function enterApp() {
+  document.getElementById('headerName').textContent = session.name || session.bracelet;
+  document.getElementById('adminMenuItem').style.display = session.isAdmin ? 'block' : 'none';
+  nav(session.isAdmin ? 'admin' : 'main');
+}
+
+function logout() {
+  session = null;
+  DB.set('session', null);
+  closeMenu();
+  showScreen('authScreen');
+  document.getElementById('regName').value = '';
+  document.getElementById('regBracelet').value = '';
+  document.getElementById('regPassword').value = '';
+}
+
+// ============ MENU ============
+function openMenu() {
+  document.getElementById('overlay').classList.add('active');
+  document.getElementById('sidebar').classList.add('active');
+}
+function closeMenu() {
+  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('sidebar').classList.remove('active');
+}
+
+// ============ NAV ============
+function nav(page) {
+  closeMenu();
+  if (page === 'main') { renderMain(); showScreen('mainScreen'); }
+  else if (page === 'reports') { renderReports(); showScreen('reportsScreen'); }
+  else if (page === 'rating') { renderRating(); showScreen('ratingScreen'); }
+  else if (page === 'info') { showScreen('infoScreen'); }
+  else if (page === 'admin' && session?.isAdmin) { renderAdmin(); showScreen('adminScreen'); }
+}
+
+// ============ MAIN ============
+function renderMain() {
+  const user = users.find(u => u.bracelet === session.bracelet);
+  const totalSteps = user ? user.steps : 0;
+
+  const contestsHtml = contests.length
+    ? contests.map(c => `
+      <div class="contest-item">
+        <h4>${escapeHtml(c.title)}</h4>
+        <div class="meta">Цель: ${escapeHtml(c.goal)}</div>
+        <div class="prize">🎁 ${escapeHtml(c.prize)}</div>
+        <div class="soon-badge">Скоро будет выбран победитель</div>
+      </div>`).join('')
+    : '<div class="empty-state">Пока нет активных конкурсов</div>';
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="content-card">
+      <h3>Мои шаги</h3>
+      <div class="step-count">${totalSteps.toLocaleString('ru-RU')}</div>
+      <div class="step-label">всего одобрено</div>
+      <input type="number" id="stepsInput" placeholder="Введите количество шагов">
+      <button class="btn-primary" onclick="saveSteps()">📥 Загрузить шаги</button>
+      <div class="file-input-wrapper">
+        <label class="file-label" for="screenshotInput">🖼 Выбрать скриншот</label>
+        <input type="file" id="screenshotInput" accept="image/*" onchange="handleScreenshot(event)">
+      </div>
+      <img id="previewImg" class="preview-img">
+      <button class="btn-success" style="margin-top:10px;" onclick="submitReport()">📤 Отправить на проверку</button>
+    </div>
+    <div class="content-card">
+      <h3>Конкурсы</h3>
+      ${contestsHtml}
+    </div>
+  `;
+}
+
+function saveSteps() {
+  const v = parseInt(document.getElementById('stepsInput').value);
+  if (isNaN(v) || v <= 0) { alert('Введите корректное количество шагов'); return; }
+  currentSteps = v;
+  alert('Шаги сохранены. Теперь выберите скриншот и отправьте на проверку.');
+}
+
+function handleScreenshot(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentScreenshot = ev.target.result;
+    const img = document.getElementById('previewImg');
+    img.src = currentScreenshot;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitReport() {
+  if (!currentSteps || currentSteps <= 0) { alert('Сначала введите и сохраните шаги'); return; }
+  if (!currentScreenshot) { alert('Выберите скриншот'); return; }
+
+  reports.push({
+    id: Date.now(),
+    user: session.name,
+    bracelet: session.bracelet,
+    steps: currentSteps,
+    screenshot: currentScreenshot,
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  });
+  DB.set('reports', reports);
+  currentSteps = 0;
+  currentScreenshot = null;
+  alert('Отчёт отправлен на проверку!');
+  renderMain();
+}
+
+// ============ REPORTS ============
+function renderReports() {
+  const mine = reports.filter(r => r.bracelet === session.bracelet).reverse();
+  const el = document.getElementById('reportsList');
+  if (!mine.length) { el.innerHTML = '<div class="empty-state">У вас пока нет отчётов</div>'; return; }
+  const labels = { pending: 'На проверке', approved: 'Одобрено', rejected: 'Отклонено' };
+  el.innerHTML = mine.map(r => `
+    <div class="report-item ${r.status}">
+      <div class="report-status">${labels[r.status]}</div>
+      <div class="report-steps">${r.steps.toLocaleString('ru-RU')} шагов</div>
+      <div class="report-date">${new Date(r.createdAt).toLocaleString('ru-RU')}</div>
+    </div>`).join('');
+}
+
+// ============ RATING ============
+function renderRating() {
+  const totals = {};
+  users.forEach(u => totals[u.bracelet] = { name: u.name, steps: 0 });
+  reports.filter(r => r.status === 'approved').forEach(r => {
+    if (totals[r.bracelet]) totals[r.bracelet].steps += r.steps;
+    else totals[r.bracelet] = { name: r.user, steps: r.steps };
+  });
+  const arr = Object.values(totals).filter(u => u.steps > 0).sort((a, b) => b.steps - a.steps);
+  const el = document.getElementById('ratingList');
+  if (!arr.length) { el.innerHTML = '<div class="empty-state">Рейтинг пуст.<br>Станьте первым!</div>'; return; }
+  el.innerHTML = arr.map((u, i) => {
+    const cls = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+    return `<div class="rating-row ${cls}">
+      <div class="rating-pos">#${i + 1}</div>
+      <div class="rating-name">${escapeHtml(u.name)}</div>
+      <div class="rating-steps">${u.steps.toLocaleString('ru-RU')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============ ADMIN ============
+function renderAdmin() {
+  // contests
+  const cl = document.getElementById('adminContestsList');
+  cl.innerHTML = contests.length
+    ? contests.map(c => `
+      <div class="admin-contest">
+        <strong>${escapeHtml(c.title)}</strong><br>
+        <small style="color:var(--text-dim);">Цель: ${escapeHtml(c.goal)} • Приз: ${escapeHtml(c.prize)}</small>
+      </div>`).join('')
+    : '<div class="empty-state">Конкурсов нет</div>';
+
+  // reports
+  const rl = document.getElementById('adminReportsList');
+  const pending = reports.filter(r => r.status === 'pending');
+  if (!pending.length) {
+    rl.innerHTML = '<div class="empty-state">Нет отчётов на проверку</div>';
+  } else {
+    rl.innerHTML = pending.map(r => `
+      <div class="admin-report">
+        <div class="report-header">
+          <strong>${escapeHtml(r.user)}</strong>
+          <span style="color:var(--text-dim);">${escapeHtml(r.bracelet)}</span>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:var(--accent-1);">${r.steps.toLocaleString('ru-RU')} шагов</div>
+        ${r.screenshot ? `<img src="${r.screenshot}" alt="скриншот">` : ''}
+        <div class="action-row">
+          <button class="btn-success" onclick="reviewReport(${r.id}, 'approved')">✓ Одобрить</button>
+          <button class="btn-danger" onclick="reviewReport(${r.id}, 'rejected')">✕ Отклонить</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // users
+  const ul = document.getElementById('adminUsersList');
+  if (!users.length) {
+    ul.innerHTML = '<div class="empty-state">Пользователей нет</div>';
+  } else {
+    ul.innerHTML = users.map(u => `
+      <div class="user-admin-row">
+        <div class="user-admin-name">
+          ${escapeHtml(u.name)}
+          <small>${escapeHtml(u.bracelet)}</small>
+        </div>
+        <div class="user-admin-steps">${(u.steps||0).toLocaleString('ru-RU')}</div>
+        <div class="steps-edit-row">
+          <input type="number" placeholder="±шаги" id="adj_${btoa(u.bracelet)}" style="width:70px;">
+          <button class="btn-secondary mini-btn" onclick="adjustSteps('${escapeAttr(u.bracelet)}', '${btoa(u.bracelet)}')">±</button>
+          <button class="btn-danger mini-btn" onclick="deleteUser('${escapeAttr(u.bracelet)}')">🗑</button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function createContest() {
+  const title = document.getElementById('contestTitle').value.trim();
+  const goal  = document.getElementById('contestGoal').value.trim();
+  const prize = document.getElementById('contestPrize').value.trim();
+  if (!title || !goal || !prize) { alert('Заполните все поля'); return; }
+  contests.push({ id: Date.now(), title, goal, prize, createdAt: new Date().toISOString() });
+  DB.set('contests', contests);
+  document.getElementById('contestTitle').value = '';
+  document.getElementById('contestGoal').value = '';
+  document.getElementById('contestPrize').value = '';
+  renderAdmin();
+}
+
+function reviewReport(id, status) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  r.status = status;
+  DB.set('reports', reports);
+  if (status === 'approved') {
+    const u = users.find(x => x.bracelet === r.bracelet);
+    if (u) { u.steps += r.steps; DB.set('users', users); }
+  }
+  renderAdmin();
+}
+
+function adjustSteps(bracelet, encoded) {
+  const input = document.getElementById('adj_' + encoded);
+  const delta = parseInt(input.value);
+  if (isNaN(delta) || delta === 0) { alert('Введите число (можно отрицательное)'); return; }
+  const u = users.find(x => x.bracelet === bracelet);
+  if (!u) return;
+  u.steps = Math.max(0, (u.steps || 0) + delta);
+  DB.set('users', users);
+  renderAdmin();
+}
+
+function deleteUser(bracelet) {
+  if (!confirm(`Удалить пользователя «${bracelet}»?`)) return;
+  users = users.filter(u => u.bracelet !== bracelet);
+  reports = reports.filter(r => r.bracelet !== bracelet);
+  DB.set('users', users);
+  DB.set('reports', reports);
+  renderAdmin();
+}
+
+function resetRating() {
+  if (!confirm('Обнулить шаги всех пользователей? (рейтинг очистится)')) return;
+  users.forEach(u => u.steps = 0);
+  DB.set('users', users);
+  alert('Рейтинг очищен');
+  renderAdmin();
+}
+
+function fullReset() {
+  if (!confirm('⚠️ ПОЛНЫЙ СБРОС: будут удалены ВСЕ пользователи, конкурсы и отчёты. Продолжить?')) return;
+  if (!confirm('Точно? Это действие необратимо.')) return;
+  localStorage.clear();
+  users = []; contests = []; reports = []; session = null;
+  showScreen('authScreen');
+  alert('Все данные удалены');
+}
+
+// ============ UTILS ============
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) {
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// ============ INIT ============
+(function init() {
+  if (session) enterApp();
+  else showScreen('authScreen');
+})();
+</script>
+</body>
+</html>
