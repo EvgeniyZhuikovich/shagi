@@ -3,50 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0a0a0f">
-<title>Шаги</title>
+<title>StepTrack</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
-  --bg-0: #0a0a0f;
-  --bg-1: #12121c;
-  --bg-2: #1a1a28;
-  --surface: rgba(255,255,255,0.04);
-  --surface-2: rgba(255,255,255,0.07);
-  --border: rgba(255,255,255,0.08);
-  --border-strong: rgba(255,255,255,0.14);
-  --text: #f0f0f5;
-  --text-dim: #8a8aa0;
-  --accent-1: #00e5ff;
-  --accent-2: #b500ff;
-  --accent-3: #ff2d95;
-  --success: #00ffa3;
-  --danger: #ff3860;
-  --warn: #ffb800;
+  --bg-0: #0a0a0f; --bg-1: #12121c; --bg-2: #1a1a28;
+  --surface: rgba(255,255,255,0.04); --surface-2: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.14);
+  --text: #f0f0f5; --text-dim: #8a8aa0;
+  --accent-1: #00e5ff; --accent-2: #b500ff;
+  --success: #00ffa3; --danger: #ff3860; --warn: #ffb800;
   --grad: linear-gradient(135deg, #00e5ff 0%, #b500ff 100%);
 }
 html, body { height: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-0);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  position: relative;
-  overflow-x: hidden;
+  background: var(--bg-0); color: var(--text); min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px; position: relative; overflow-x: hidden;
 }
 body::before, body::after {
-  content: '';
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.35;
-  z-index: 0;
-  pointer-events: none;
-  animation: float 14s ease-in-out infinite;
+  content: ''; position: fixed; border-radius: 50%; filter: blur(80px);
+  opacity: 0.35; z-index: 0; pointer-events: none; animation: float 14s ease-in-out infinite;
 }
 body::before { width: 400px; height: 400px; background: var(--accent-2); top: -100px; left: -100px; }
 body::after { width: 500px; height: 500px; background: var(--accent-1); bottom: -150px; right: -150px; animation-delay: -7s; }
@@ -57,11 +35,8 @@ body::after { width: 500px; height: 500px; background: var(--accent-1); bottom: 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 .card, .content-card, .header, .sidebar {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px;
 }
 .card { padding: 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02) inset; }
 
@@ -71,13 +46,15 @@ h3::before { content: ''; width: 4px; height: 16px; background: var(--grad); bor
 .subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 22px; }
 
 input[type="text"], input[type="password"], input[type="number"] {
-  width: 100%; padding: 15px 16px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; font-size: 16px; color: var(--text); margin-bottom: 12px; outline: none; transition: all .2s; font-family: inherit;
+  width: 100%; padding: 15px 16px; background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: 14px; font-size: 16px; color: var(--text); margin-bottom: 12px; outline: none; transition: all .2s; font-family: inherit;
 }
 input::placeholder { color: var(--text-dim); }
 input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
 
 button {
-  width: 100%; padding: 15px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s, filter .2s, box-shadow .2s; margin-bottom: 10px; font-family: inherit; letter-spacing: 0.2px;
+  width: 100%; padding: 15px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: transform .1s, filter .2s, box-shadow .2s; margin-bottom: 10px; font-family: inherit; letter-spacing: 0.2px;
 }
 button:active { transform: scale(0.97); }
 
@@ -237,7 +214,7 @@ button:active { transform: scale(0.97); }
   <div class="content-card">
     <div class="info-block">
       <h4>О приложении</h4>
-      <p>Шаги — платформа для отслеживания активности и участия в конкурсах по шагам. Загружайте свои результаты, соревнуйтесь с другими и выигрывайте призы.</p>
+      <p>StepTrack — платформа для отслеживания активности и участия в конкурсах по шагам. Загружайте свои результаты, соревнуйтесь с другими и выигрывайте призы.</p>
     </div>
     <div class="info-block">
       <h4>Как участвовать</h4>
@@ -469,7 +446,7 @@ function submitReport() {
   if (!currentSteps || currentSteps <= 0) { alert('Сначала введите и сохраните шаги'); return; }
   if (!currentScreenshot) { alert('Выберите скриншот'); return; }
 
-  // Сразу начисляем шаги пользователю
+  // Начисляем шаги сразу
   const u = users.find(x => x.bracelet === session.bracelet);
   if (u) { u.steps += currentSteps; DB.set('users', users); }
 
