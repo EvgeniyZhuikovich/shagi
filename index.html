@@ -2,16 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0a0f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Шаги">
 <title>Шаги</title>
-<link rel="manifest" href='data:application/manifest+json,{"name":"Шаги","short_name":"Шаги","start_url":".","display":"standalone","background_color":"%230a0a0f","theme_color":"%230a0a0f","icons":[{"src":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMGEwYTBmIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAwZTVmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkb4PC94+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAwZTVmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkb4PC94Pjwvc3ZnPg==","sizes":"512x512","type":"image/svg+xml"}]}'>
-
 <style>
-/* Стили оставляем абсолютно такими же, как в прошлой версии */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
   --bg-0: #0a0a0f;
@@ -43,9 +37,6 @@ body {
   padding: 16px;
   position: relative;
   overflow-x: hidden;
-  /* Учитываем "чёлку" на iPhone */
-  padding-top: calc(16px + env(safe-area-inset-top));
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }
 body::before, body::after {
   content: '';
@@ -126,7 +117,7 @@ button:active { transform: scale(0.97); }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; z-index: 100; }
 .overlay.active { display: block; animation: fadeIn .2s; }
-.sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1); padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); border-radius: 0 24px 24px 0; padding-top: calc(24px + env(safe-area-inset-top)); }
+.sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100%; background: var(--bg-1); z-index: 101; transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1); padding: 24px 20px; overflow-y: auto; border-right: 1px solid var(--border); border-radius: 0 24px 24px 0; }
 .sidebar.active { transform: translateX(0); }
 .sidebar h2 { color: var(--text); margin-bottom: 24px; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .menu-item { padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; font-weight: 600; color: var(--text); transition: all .2s; font-size: 15px; }
@@ -332,7 +323,6 @@ let isRegisterMode = true;
 let currentScreenshot = null;
 let currentSteps = 0;
 
-// ============ AUTH ============
 function toggleAuth() {
   isRegisterMode = !isRegisterMode;
   document.getElementById('authTitle').textContent = isRegisterMode ? 'Регистрация' : 'Вход';
@@ -402,7 +392,6 @@ function logout() {
   document.getElementById('regPassword').value = '';
 }
 
-// ============ MENU ============
 function openMenu() {
   document.getElementById('overlay').classList.add('active');
   document.getElementById('sidebar').classList.add('active');
@@ -412,7 +401,6 @@ function closeMenu() {
   document.getElementById('sidebar').classList.remove('active');
 }
 
-// ============ NAV ============
 function nav(page) {
   closeMenu();
   if (page === 'main') { renderMain(); showScreen('mainScreen'); }
@@ -422,7 +410,6 @@ function nav(page) {
   else if (page === 'admin' && session?.isAdmin) { renderAdmin(); showScreen('adminScreen'); }
 }
 
-// ============ MAIN ============
 function renderMain() {
   const user = users.find(u => u.bracelet === session.bracelet);
   const totalSteps = user ? user.steps : 0;
@@ -445,4 +432,222 @@ function renderMain() {
       <input type="number" id="stepsInput" placeholder="Введите количество шагов">
       <button class="btn-primary" onclick="saveSteps()">📥 Загрузить шаги</button>
       <div class="file-input-wrapper">
-       
+        <label class="file-label" for="screenshotInput">🖼 Выбрать скриншот</label>
+        <input type="file" id="screenshotInput" accept="image/*" onchange="handleScreenshot(event)">
+      </div>
+      <img id="previewImg" class="preview-img">
+      <button class="btn-success" style="margin-top:10px;" onclick="submitReport()">📤 Отправить на проверку</button>
+    </div>
+    <div class="content-card">
+      <h3>Конкурсы</h3>
+      ${contestsHtml}
+    </div>
+  `;
+}
+
+function saveSteps() {
+  const v = parseInt(document.getElementById('stepsInput').value);
+  if (isNaN(v) || v <= 0) { alert('Введите корректное количество шагов'); return; }
+  currentSteps = v;
+  alert('Шаги сохранены. Теперь выберите скриншот и отправьте на проверку.');
+}
+
+function handleScreenshot(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentScreenshot = ev.target.result;
+    const img = document.getElementById('previewImg');
+    img.src = currentScreenshot;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitReport() {
+  if (!currentSteps || currentSteps <= 0) { alert('Сначала введите и сохраните шаги'); return; }
+  if (!currentScreenshot) { alert('Выберите скриншот'); return; }
+
+  // Сразу начисляем шаги пользователю
+  const u = users.find(x => x.bracelet === session.bracelet);
+  if (u) { u.steps += currentSteps; DB.set('users', users); }
+
+  reports.push({
+    id: Date.now(),
+    user: session.name,
+    bracelet: session.bracelet,
+    steps: currentSteps,
+    screenshot: currentScreenshot,
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  });
+  DB.set('reports', reports);
+  
+  currentSteps = 0;
+  currentScreenshot = null;
+  alert('Отчёт отправлен! Шаги уже начислены, ожидается проверка.');
+  renderMain();
+}
+
+function renderReports() {
+  const mine = reports.filter(r => r.bracelet === session.bracelet).reverse();
+  const el = document.getElementById('reportsList');
+  if (!mine.length) { el.innerHTML = '<div class="empty-state">У вас пока нет отчётов</div>'; return; }
+  const labels = { pending: 'На проверке', approved: 'Одобрено', rejected: 'Отклонено' };
+  el.innerHTML = mine.map(r => `
+    <div class="report-item ${r.status}">
+      <div class="report-status">${labels[r.status]}</div>
+      <div class="report-steps">${r.steps.toLocaleString('ru-RU')} шагов</div>
+      <div class="report-date">${new Date(r.createdAt).toLocaleString('ru-RU')}</div>
+    </div>`).join('');
+}
+
+function renderRating() {
+  const totals = {};
+  users.forEach(u => totals[u.bracelet] = { name: u.name, steps: 0 });
+  users.forEach(u => {
+    if (totals[u.bracelet]) totals[u.bracelet].steps = u.steps || 0;
+  });
+
+  const arr = Object.values(totals).filter(u => u.steps > 0).sort((a, b) => b.steps - a.steps);
+  const el = document.getElementById('ratingList');
+  if (!arr.length) { el.innerHTML = '<div class="empty-state">Рейтинг пуст.<br>Станьте первым!</div>'; return; }
+  el.innerHTML = arr.map((u, i) => {
+    const cls = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+    return `<div class="rating-row ${cls}">
+      <div class="rating-pos">#${i + 1}</div>
+      <div class="rating-name">${escapeHtml(u.name)}</div>
+      <div class="rating-steps">${u.steps.toLocaleString('ru-RU')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAdmin() {
+  const cl = document.getElementById('adminContestsList');
+  cl.innerHTML = contests.length
+    ? contests.map(c => `
+      <div class="admin-contest">
+        <strong>${escapeHtml(c.title)}</strong><br>
+        <small style="color:var(--text-dim);">Цель: ${escapeHtml(c.goal)} • Приз: ${escapeHtml(c.prize)}</small>
+      </div>`).join('')
+    : '<div class="empty-state">Конкурсов нет</div>';
+
+  const rl = document.getElementById('adminReportsList');
+  const pending = reports.filter(r => r.status === 'pending');
+  if (!pending.length) {
+    rl.innerHTML = '<div class="empty-state">Нет отчётов на проверку</div>';
+  } else {
+    rl.innerHTML = pending.map(r => `
+      <div class="admin-report">
+        <div class="report-header">
+          <strong>${escapeHtml(r.user)}</strong>
+          <span style="color:var(--text-dim);">${escapeHtml(r.bracelet)}</span>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:var(--accent-1);">${r.steps.toLocaleString('ru-RU')} шагов</div>
+        ${r.screenshot ? `<img src="${r.screenshot}" alt="скриншот">` : ''}
+        <div class="action-row">
+          <button class="btn-success" onclick="reviewReport(${r.id}, 'approved')">✓ Одобрить</button>
+          <button class="btn-danger" onclick="reviewReport(${r.id}, 'rejected')">✕ Отклонить</button>
+        </div>
+      </div>`).join('');
+  }
+
+  const ul = document.getElementById('adminUsersList');
+  if (!users.length) {
+    ul.innerHTML = '<div class="empty-state">Пользователей нет</div>';
+  } else {
+    ul.innerHTML = users.map(u => `
+      <div class="user-admin-row">
+        <div class="user-admin-name">
+          ${escapeHtml(u.name)}
+          <small>${escapeHtml(u.bracelet)}</small>
+        </div>
+        <div class="user-admin-steps">${(u.steps||0).toLocaleString('ru-RU')}</div>
+        <div class="steps-edit-row">
+          <input type="number" placeholder="±шаги" id="adj_${btoa(u.bracelet)}" style="width:70px;">
+          <button class="btn-secondary mini-btn" onclick="adjustSteps('${escapeAttr(u.bracelet)}', '${btoa(u.bracelet)}')">±</button>
+          <button class="btn-danger mini-btn" onclick="deleteUser('${escapeAttr(u.bracelet)}')">🗑</button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function createContest() {
+  const title = document.getElementById('contestTitle').value.trim();
+  const goal  = document.getElementById('contestGoal').value.trim();
+  const prize = document.getElementById('contestPrize').value.trim();
+  if (!title || !goal || !prize) { alert('Заполните все поля'); return; }
+  contests.push({ id: Date.now(), title, goal, prize, createdAt: new Date().toISOString() });
+  DB.set('contests', contests);
+  document.getElementById('contestTitle').value = '';
+  document.getElementById('contestGoal').value = '';
+  document.getElementById('contestPrize').value = '';
+  renderAdmin();
+}
+
+function reviewReport(id, status) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  
+  if (status === 'rejected') {
+    const u = users.find(x => x.bracelet === r.bracelet);
+    if (u) { u.steps = Math.max(0, u.steps - r.steps); DB.set('users', users); }
+  }
+  
+  r.status = status;
+  DB.set('reports', reports);
+  renderAdmin();
+}
+
+function adjustSteps(bracelet, encoded) {
+  const input = document.getElementById('adj_' + encoded);
+  const delta = parseInt(input.value);
+  if (isNaN(delta) || delta === 0) { alert('Введите число (можно отрицательное)'); return; }
+  const u = users.find(x => x.bracelet === bracelet);
+  if (!u) return;
+  u.steps = Math.max(0, (u.steps || 0) + delta);
+  DB.set('users', users);
+  renderAdmin();
+}
+
+function deleteUser(bracelet) {
+  if (!confirm(`Удалить пользователя «${bracelet}»?`)) return;
+  users = users.filter(u => u.bracelet !== bracelet);
+  reports = reports.filter(r => r.bracelet !== bracelet);
+  DB.set('users', users);
+  DB.set('reports', reports);
+  renderAdmin();
+}
+
+function resetRating() {
+  if (!confirm('Обнулить шаги всех пользователей? (рейтинг очистится)')) return;
+  users.forEach(u => u.steps = 0);
+  DB.set('users', users);
+  alert('Рейтинг очищен');
+  renderAdmin();
+}
+
+function fullReset() {
+  if (!confirm('⚠️ ПОЛНЫЙ СБРОС: будут удалены ВСЕ пользователи, конкурсы и отчёты. Продолжить?')) return;
+  if (!confirm('Точно? Это действие необратимо.')) return;
+  localStorage.clear();
+  users = []; contests = []; reports = []; session = null;
+  showScreen('authScreen');
+  alert('Все данные удалены');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'''}[c]));
+}
+function escapeAttr(s) {
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '"');
+}
+
+(function init() {
+  if (session) enterApp();
+  else showScreen('authScreen');
+})();
+</script>
+</body>
+</html>
